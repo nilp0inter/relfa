@@ -5,7 +5,7 @@
     cargoToml = builtins.fromTOML (builtins.readFile ../Cargo.toml);
   in
   {
-    packages.relfa = pkgs.rustPlatform.buildRustPackage rec {
+    packages.relfa = pkgs.rustPlatform.buildRustPackage {
       pname = "relfa";
       version = cargoToml.package.version;
 

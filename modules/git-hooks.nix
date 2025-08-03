@@ -1,0 +1,41 @@
+{ inputs, ... }:
+{
+  imports = [
+    inputs.git-hooks-nix.flakeModule
+  ];
+
+  perSystem = { config, self', inputs', pkgs, system, ... }: {
+    pre-commit = {
+      check.enable = true;
+      
+      settings = {
+        hooks = {
+          # Rust formatting check (matches CI: cargo fmt --all -- --check)
+          rustfmt = {
+            enable = true;
+            packageOverrides.cargo = pkgs.cargo;
+            packageOverrides.rustfmt = pkgs.rustfmt;
+          };
+          
+          # Rust linting (matches CI: cargo clippy --all-targets --all-features -- -D warnings)
+          clippy = {
+            enable = true;
+            args = [ "--all-targets" "--all-features" "--" "-D" "warnings" ];
+          };
+          
+          # Run cargo test (matches CI: cargo test --verbose)
+          cargo-test = {
+            enable = true;
+            name = "cargo-test";
+            entry = "${pkgs.cargo}/bin/cargo test --verbose";
+            language = "system";
+            files = "\\.(rs|toml)$";
+            pass_filenames = false;
+          };
+        };
+      };
+    };
+
+    # Pre-commit hooks are automatically installed when entering the devshell
+  };
+}
