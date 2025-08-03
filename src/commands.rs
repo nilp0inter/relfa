@@ -9,7 +9,7 @@ use crate::scanner::{Scanner, StaleItem};
 use crate::utils::{delete_item, open_file_with_default, view_file_with_pager};
 
 pub fn scan_inbox() -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let scanner = Scanner::new(config);
     let stale_items = scanner.scan_inbox()?;
     scanner.display_scan_results(&stale_items);
@@ -17,7 +17,7 @@ pub fn scan_inbox() -> Result<()> {
 }
 
 pub fn interactive_review() -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config.clone());
 
@@ -127,7 +127,7 @@ pub fn interactive_review() -> Result<()> {
 }
 
 pub fn archive_all_with_note(note: Option<&str>) -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config);
 
@@ -151,7 +151,7 @@ pub fn archive_all_with_note(note: Option<&str>) -> Result<()> {
 }
 
 pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config.clone());
 
@@ -199,19 +199,19 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
 }
 
 pub fn resurrect_files(pattern: &str) -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let graveyard = GraveyardManager::new(config);
     graveyard.resurrect_files(pattern)
 }
 
 pub fn search_graveyard(pattern: &str) -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let graveyard = GraveyardManager::new(config);
     graveyard.search_files(pattern)
 }
 
 pub fn auto_archive_eligible_files(note: Option<&str>) -> Result<()> {
-    let config = Config::load()?;
+    let config = Config::load_without_save()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config.clone());
 

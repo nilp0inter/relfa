@@ -120,24 +120,36 @@ impl SubdirConfig {
 
 impl Config {
     pub fn load() -> Result<Self> {
+        Self::load_with_save(true)
+    }
+
+    pub fn load_without_save() -> Result<Self> {
+        Self::load_with_save(false)
+    }
+
+    fn load_with_save(auto_save: bool) -> Result<Self> {
         let config_path = Self::config_path();
 
         if config_path.exists() {
             let content = fs::read_to_string(&config_path).context("Failed to read config file")?;
 
-            // Try to parse, but if it fails due to missing fields, use defaults and save
+            // Try to parse, but if it fails due to missing fields, use defaults
             match toml::from_str::<Self>(&content) {
                 Ok(config) => Ok(config),
                 Err(_) => {
-                    // Config format has changed, use defaults and save new format
+                    // Config format has changed, use defaults and optionally save new format
                     let config = Self::default();
-                    config.save()?;
+                    if auto_save {
+                        config.save()?;
+                    }
                     Ok(config)
                 }
             }
         } else {
             let config = Self::default();
-            config.save()?;
+            if auto_save {
+                config.save()?;
+            }
             Ok(config)
         }
     }

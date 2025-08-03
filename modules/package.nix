@@ -11,6 +11,8 @@
 
       src = ../.;
 
+      outputs = [ "out" "man" ];
+
       cargoLock = {
         lockFile = ../Cargo.lock;
       };
@@ -26,12 +28,18 @@
         pkgs.darwin.apple_sdk.frameworks.UserNotifications
       ];
 
+      postInstall = ''
+        # Install man page to man output
+        install -Dm644 relfa.1 $man/share/man/man1/relfa.1
+      '';
+
       meta = with pkgs.lib; {
         description = cargoToml.package.description;
         homepage = cargoToml.package.homepage;
         license = licenses.mit;
-        maintainers = [ ];
+        maintainers = with maintainers; [ nilp0inter ];
         mainProgram = "relfa";
+        outputsToInstall = [ "out" "man" ];
       };
     };
 

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-08-03
+
+### Fixed
+- **Systemd timer compatibility**: Fixed config loading to never attempt writing config files during read-only operations (scan, archive commands)
+- **Read-only environment support**: Commands now work properly in systemd services and other read-only contexts
+
+### Added
+- **Nix flake with Home Manager module**: Complete Nix flake implementation with packages and home-manager integration
+- **Systemd timer support**: Home Manager module includes systemd timer configuration for automated execution
+- **Multiple package outputs**: Binary and man page are now separate outputs following Nix best practices
+- **Comprehensive Nix documentation**: Added detailed Nix usage section to README with examples
+
+### Technical
+- Added `Config::load_without_save()` method for read-only config loading
+- Updated all non-config commands to use read-only config loading
+- Implemented flake-file architecture with modular Nix configuration
+- Added systemd user service and timer definitions
+- Package derivation now includes man page installation with proper outputs
+
 ## [0.2.0] - 2025-08-03
 
 ### Added
@@ -85,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling
 - CI/CD pipeline with automated testing and publishing
 
+[0.2.1]: https://github.com/nilp0inter/relfa/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/nilp0inter/relfa/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/nilp0inter/relfa/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/nilp0inter/relfa/compare/v0.1.0...v0.1.1
