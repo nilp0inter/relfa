@@ -218,7 +218,10 @@ pub fn auto_archive_eligible_files(note: Option<&str>) -> Result<()> {
     let auto_archive_items = scanner.scan_auto_archive_eligible()?;
 
     if auto_archive_items.is_empty() {
-        println!("✨ No files eligible for auto-archiving found - all files are within the auto-archive threshold of {} days!", config.auto_archive_threshold_days);
+        println!(
+            "✨ No files eligible for auto-archiving found - all files are within the auto-archive threshold of {} days!",
+            config.auto_archive_threshold_days
+        );
         return Ok(());
     }
 

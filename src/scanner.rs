@@ -209,12 +209,16 @@ impl Scanner {
                 println!("   {}", item.display());
             }
 
-            println!("   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!");
+            println!(
+                "   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!"
+            );
         }
 
         println!("\n💡 Run 'relfa review' to interactively deal with these items");
         if !stale_items.is_empty() && !auto_archive_items.is_empty() {
-            println!("   or 'relfa archive' to auto-archive old files (or 'relfa archive --all' for all).");
+            println!(
+                "   or 'relfa archive' to auto-archive old files (or 'relfa archive --all' for all)."
+            );
         } else if !stale_items.is_empty() {
             println!("   or 'relfa archive --all' to archive them all to the Graveyard.");
         } else if !auto_archive_items.is_empty() {
