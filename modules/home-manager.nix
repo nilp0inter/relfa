@@ -232,7 +232,7 @@
         home.packages = [ cfg.package ];
 
         xdg.configFile."relfa/config.toml" = lib.mkIf (cfg.settings != { }) {
-          source = (pkgs.formats.toml { }).generate "relfa-config" cfg.settings;
+          source = (pkgs.formats.toml { }).generate "relfa-config" (lib.filterAttrsRecursive (n: v: v != null) cfg.settings);
         };
 
         systemd.user.services.relfa = lib.mkIf cfg.timer.enable {
