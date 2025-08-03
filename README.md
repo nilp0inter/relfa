@@ -1,7 +1,7 @@
 <div align="center">
 
-# 🪦 Relfa
-<em>Your gentle digital gravedigger</em>
+<h1>🪦 Relfa</h1>
+<p><em>Your gentle digital gravedigger</em></p>
 
 [![CI](https://img.shields.io/github/actions/workflow/status/nilp0inter/relfa/ci.yml?branch=main&style=flat-square)](https://github.com/nilp0inter/relfa/actions)
 [![Crates.io](https://img.shields.io/crates/v/relfa?style=flat-square)](https://crates.io/crates/relfa)
