@@ -20,15 +20,13 @@
             };
 
             # Rust linting (matches CI: cargo clippy --all-targets --all-features -- -D warnings)
-            clippy = {
+            cargo-clippy = {
               enable = true;
-              args = [
-                "--all-targets"
-                "--all-features"
-                "--"
-                "-D"
-                "warnings"
-              ];
+              name = "cargo-clippy";
+              entry = "${pkgs.cargo}/bin/cargo clippy --all-targets --all-features -- -D warnings";
+              language = "system";
+              files = "\\.rs$";
+              pass_filenames = false;
             };
 
             # Run cargo test (matches CI: cargo test --verbose)
