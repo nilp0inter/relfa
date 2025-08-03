@@ -1,189 +1,697 @@
-# Relfa 🪦
+# 🪦 Relfa - Your Gentle Digital Gravedigger
 
-**Relfa** is your gentle digital gravedigger. It helps you keep your computer’s clutter under control by monitoring your `Inbox` folder, nudging you to review old files, and lovingly archiving them in a dust-covered, cobwebby digital **Graveyard** — instead of letting them rot in forgotten digital corners.
+<div align="center">
 
-> “In Relfa’s Graveyard, nothing is truly lost: just waiting in gentle slumber… for you, or the next digital archaeologist.”
+![Relfa Banner](https://via.placeholder.com/800x200/2C3E50/ECF0F1?text=🪦+Relfa+-+Digital+File+Management+with+Love)
 
----
+**Keep your computer's clutter under control with loving care**
 
-## Features
+[![GitHub release](https://img.shields.io/github/v/release/nilp0inter/relfa?style=flat-square)](https://github.com/nilp0inter/relfa/releases)
+[![Crates.io](https://img.shields.io/crates/v/relfa?style=flat-square)](https://crates.io/crates/relfa)
+[![CI](https://img.shields.io/github/actions/workflow/status/nilp0inter/relfa/ci.yml?branch=main&style=flat-square)](https://github.com/nilp0inter/relfa/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/nilp0inter/relfa?style=flat-square)](https://codecov.io/gh/nilp0inter/relfa)
+[![License](https://img.shields.io/github/license/nilp0inter/relfa?style=flat-square)](LICENSE)
+[![Downloads](https://img.shields.io/crates/d/relfa?style=flat-square)](https://crates.io/crates/relfa)
 
-- 📦 **Inbox Watch:** Monitors your `~/Inbox` and reminds you about neglected files and folders.
-- ⏰ **Gentle Nudges:** Notifies you (CLI and/or desktop) when files become stale.
-- 🪦 **Archival Graveyard:** Moves your forgotten digital detritus into a `Graveyard`, organized by device and date.
-- 🔗 **Time-Triplets:** Each file’s journey is preserved via real file moves and spooky symlinks by **creation**, **last modification**, and **archiving** time.
-- 🕹 **CLI Tools:** Scan, review, and archive with a single command, or interactively choose what to bury… or resurrect.
-- 🔒 **Safety First:** Never deletes anything without your say-so. All file moves are safe and reversible.
-- 🔮 **Lighthearted, Never Grim:** Outputs and folders with a smile (and maybe a spider).
+[📦 Installation](#-installation) • [🚀 Quick Start](#-quick-start) • [✨ Features](#-features) • [📚 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
 
----
+*"In Relfa's Graveyard, nothing is truly lost—just waiting in gentle slumber for you, or the next digital archaeologist."*
 
-## How It Works
-
-1. **Inbox:**  
-   Save files in `~/Inbox/` for working-on or classifying later.
-
-2. **Relfa Scan:**  
-   Relfa checks which files or folders have gathered dust (i.e., no changes in N days).
-
-3. **Notifications:**  
-   Get reminders when there's digital clutter, with details on what's ripe for archiving.
-
-4. **Archiving:**  
-   Old files are **moved** into the `Graveyard` folder, organized so you always know where (and when!) you can find them.
-
-5. **Symlinks:**  
-   Each file is reachable in the `Graveyard` by its creation, modification, *and* archiving date — for the true digital time traveler.
+</div>
 
 ---
 
-## Directory Structure
+## 🌟 What is Relfa?
+
+Relfa is your **gentle digital gravedigger** that helps you maintain a clean workspace without the anxiety of permanently losing important files. Instead of aggressively deleting old files, Relfa lovingly archives them to a well-organized digital graveyard where they can rest in peace—and be easily resurrected when needed.
+
+### 🎯 Philosophy
+
+- **🕊️ Gentle Approach**: No aggressive deletions, just loving archival
+- **🔍 Smart Detection**: Identifies files that haven't been touched recently  
+- **🗃️ Organized Storage**: Creates a structured graveyard with multiple time-based views
+- **🧟‍♂️ Easy Resurrection**: Bring back archived files when you need them
+- **📝 Memory Keeping**: Add epitaphs explaining why files were archived
+- **🔗 Efficient Links**: Uses symlinks to provide multiple organizational views without file duplication
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎮 **Interactive Review**
+- Multi-action interface: archive, delete, view, open, skip
+- Safety confirmations for destructive actions
+- Real-time file preview with configurable pager
+- Desktop application integration
+
+### 🗃️ **Flexible Archival System**
+- Smart organization by creation/modification/archival dates
+- Efficient symlink-based storage
+- Configurable graveyard structure
+- Cross-platform support (Linux, macOS, Windows)
+
+</td>
+<td width="50%">
+
+### 🔍 **Powerful Search**
+- Filename pattern matching
+- Content search within epitaph notes
+- Visual indicators for match sources
+- Smart deduplication
+
+### 📱 **Modern UX**
+- Desktop notifications
+- Configurable pager support
+- Rich emoji-enhanced CLI output
+- Comprehensive man page
+
+</td>
+</tr>
+</table>
+
+## 🚀 Installation
+
+### 📦 **Quick Install**
+
+<table>
+<tr>
+<td><strong>🦀 Cargo</strong></td>
+<td><code>cargo install relfa</code></td>
+</tr>
+<tr>
+<td><strong>🍺 Homebrew</strong></td>
+<td><code>brew install relfa</code></td>
+</tr>
+<tr>
+<td><strong>🐧 Arch Linux</strong></td>
+<td><code>yay -S relfa</code></td>
+</tr>
+<tr>
+<td><strong>🐳 Docker</strong></td>
+<td><code>docker run --rm -v $(pwd):/workspace ghcr.io/nilp0inter/relfa:latest scan</code></td>
+</tr>
+</table>
+
+### 📥 **Pre-built Binaries**
+
+Download the latest release for your platform from [GitHub Releases](https://github.com/nilp0inter/relfa/releases):
+
+```bash
+# Linux (x86_64)
+curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-linux-x86_64.tar.gz | tar xz
+sudo mv relfa /usr/local/bin/
+
+# macOS (Intel)
+curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-macos-x86_64.tar.gz | tar xz
+sudo mv relfa /usr/local/bin/
+
+# macOS (Apple Silicon)
+curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-macos-aarch64.tar.gz | tar xz
+sudo mv relfa /usr/local/bin/
+
+# Windows
+# Download relfa-windows-x86_64.zip and extract to your PATH
+```
+
+### 📖 **Man Page Installation**
+
+```bash
+sudo cp relfa.1 /usr/local/share/man/man1/
+sudo mandb
+man relfa  # View the manual
+```
+
+## 🏃‍♂️ Quick Start
+
+### 1. 🔧 **Initial Setup**
+
+```bash
+# View current configuration
+relfa config
+
+# Scan your inbox for stale files  
+relfa scan
+```
+
+<details>
+<summary>📋 Expected Output</summary>
 
 ```
-/home/youruser/
-├── Inbox/
-│   ├── todo.txt
-│   └── ancient-folder/
-└── Graveyard/
-    └── HOSTNAME/
-        ├── created/
-        │   └── YYYY/MM/DD/<file-or-folder>
-        ├── modified/
-        │   └── YYYY/MM/DD/<file-or-folder> -> symlink to created
-        └── archived/
-            └── YYYY/MM/DD/<file-or-folder> -> symlink to created
+🕷️  Scanning Inbox for dusty files...
+☠️  3 items in ~/Inbox are gathering dust:
+   📄 "old-document.pdf" (file) - last touched 25 days ago (2024-07-08)
+   📄 "project-archive/" (folder) - last touched 18 days ago (2024-07-15)
+   📄 "temp-notes.txt" (file) - last touched 32 days ago (2024-07-01)
+
+💡 Run 'relfa review' to interactively deal with these items,
+   or 'relfa archive --all' to archive them all to the Graveyard.
 ```
 
-**Only** top-level files or folders in your `Inbox/` are archived (their whole contents, not bits and pieces).
+</details>
 
----
+### 2. 🔍 **Interactive Review**
 
-## Quickstart
-
-1. **Install**
-
-   Clone and build (Rust required):
-
-   ```sh
-   git clone https://github.com/youruser/relfa.git
-   cd relfa
-   cargo install --path .
-   ```
-
-2. **Run a scan**
-
-   ```sh
-   relfa scan
-   ```
-
-3. **Review & archive interactively**
-
-   ```sh
-   relfa review
-   ```
-
-4. **Archive everything ripe for burial**
-
-   ```sh
-   relfa archive --all
-   ```
-
----
-
-## CLI Commands
-
-| Command                  | What it does                                   |
-|--------------------------|------------------------------------------------|
-| `relfa scan`             | Lists stale (old/untouched) items in Inbox     |
-| `relfa review`           | Interactively archive, skip, or delete files   |
-| `relfa archive [item]`   | Manually archive a specific file/folder        |
-| `relfa archive --all`    | Archive all eligible files/folders             |
-| `relfa config`           | Show or edit config                            |
-
-Example output:
-```
-☠️  2 items in ~/Inbox are gathering dust:
-    - "forgotten.txt" (last touched: 2024-05-10)
-Archive them now? [y/N]
+```bash
+relfa review
 ```
 
----
+The interactive review gives you options for each file:
 
-## Configuration
+| Command | Action | Description |
+|---------|--------|-------------|
+| **`(a)rchive`** | 🗃️ Archive | Move to graveyard without note |
+| **`(n)ote+archive`** | 📝 Archive with epitaph | Add explanatory note |
+| **`(d)elete`** | 🗑️ Delete | Permanent deletion (requires confirmation) |
+| **`(v)iew`** | 👀 View | Preview content with pager |
+| **`(o)pen`** | 🚀 Open | Open with default application |
+| **`(s)kip`** | ⏭️ Skip | Skip for now |
+| **`(q)uit`** | 🚪 Quit | Exit review session |
 
-Edit `~/.config/relfa/config.toml` to customize:
+### 3. 📦 **Batch Operations**
+
+```bash
+# Archive all stale files at once
+relfa archive --all
+
+# Archive specific file with explanation
+relfa archive old-document.pdf --note "Outdated project specification from Q1"
+
+# Archive with batch note
+relfa archive --all --note "Weekly cleanup - $(date +%Y-%m-%d)"
+```
+
+### 4. 🔍 **Search & Resurrection**
+
+```bash
+# Search in graveyard (searches filenames AND epitaph content)
+relfa search "project"
+
+# Search by epitaph content
+relfa search "meeting notes"
+
+# Resurrect files back to inbox
+relfa resurrect "important-file"
+```
+
+<details>
+<summary>📋 Search Output Example</summary>
+
+```
+🔍 Searching for 'project' in the Graveyard...
+Found 2 matches in the Graveyard:
+  📄 created/laptop/2024/07/15/project-alpha-notes.md
+     💭 "Meeting notes from project alpha kickoff"
+  📄 created/laptop/2024/06/20/project-proposal.pdf  
+     💭 "Initial proposal document - archived after approval" 🔍
+```
+
+The 🔍 emoji indicates the match was found in the epitaph content, not the filename.
+
+</details>
+
+## 🏗️ Graveyard Structure
+
+Relfa creates an elegantly organized graveyard structure:
+
+```
+~/Graveyard/
+├── created/hostname/2024/08/02/     # Organized by creation date
+│   ├── document.pdf                 # 📄 Original file
+│   └── document.pdf.epitaph         # 📝 Optional note
+├── modified/hostname/2024/07/15/    # Organized by modification date
+│   ├── document.pdf@ → ../created/  # 🔗 Symlink to original
+│   └── document.pdf.epitaph@ →      # 🔗 Symlink to epitaph
+└── archived/hostname/2024/08/02/    # Organized by archival date
+    ├── document.pdf@ → ../modified/ # 🔗 Symlink chain
+    └── document.pdf.epitaph@ →      # 🔗 Follows same pattern
+```
+
+This structure provides:
+- 📅 **Browse by creation date**: Find files by when they were originally created
+- ✏️ **Browse by modification date**: See files by when they were last changed  
+- 🗃️ **Browse by archival date**: Review recently archived items
+- 💾 **Efficient storage**: Symlinks prevent duplication while providing multiple views
+- 🔍 **Consistent organization**: Epitaphs follow the same symlink structure as files
+
+## ⚙️ Configuration
+
+Relfa uses a TOML configuration file at `~/.config/relfa/config.toml`:
 
 ```toml
-inbox = "/home/youruser/Inbox"
-graveyard = "/home/youruser/Graveyard"
+# Basic settings
+inbox = "/home/user/Inbox"
+graveyard = "/home/user/Graveyard"
 age_threshold_days = 14
-hostname = "laptop-mbp"
-notification = "desktop" # or "cli"
+notification = "desktop"  # "desktop" or "cli"
+pager = "less"           # "less", "bat", "more", etc.
+
+[path_format]
+date_format = "{hostname}/{year}/{month:02}/{day:02}"
+
+# Flexible subdirectory configuration
+[path_format.created_subdir]
+type = "original"    # Contains actual files
+name = "created"
+
+[path_format.modified_subdir]  
+type = "symlink"     # Contains symlinks
+name = "modified"
+target = "created"   # Points to created subdir
+
+[path_format.archived_subdir]
+type = "symlink"
+name = "archived" 
+target = "modified"  # Creates chain: archived → modified → created
 ```
 
-*Default paths:*
-- Inbox: `~/Inbox`
-- Graveyard: `~/Graveyard`
-- Notifications: CLI output
+### 🎛️ **Advanced Configuration Options**
+
+<details>
+<summary>🔧 Subdirectory Types</summary>
+
+Each subdirectory can be configured as:
+
+- **`original`** - Contains the actual files
+- **`symlink`** - Contains symlinks pointing to another subdirectory  
+- **`nothing`** - Disabled (not created)
+
+Example configurations:
+
+```toml
+# Minimal: Only organize by creation date
+[path_format.created_subdir]
+type = "original"
+name = "by-creation"
+
+[path_format.modified_subdir]
+type = "nothing"
+
+[path_format.archived_subdir] 
+type = "nothing"
+```
+
+```toml
+# Complex chain: created → modified → archived
+[path_format.created_subdir]
+type = "original"
+name = "created"
+
+[path_format.modified_subdir]
+type = "symlink"  
+name = "modified"
+target = "created"
+
+[path_format.archived_subdir]
+type = "symlink"
+name = "archived"
+target = "modified"
+```
+
+</details>
+
+<details>
+<summary>📅 Date Format Options</summary>
+
+The `date_format` supports these placeholders:
+
+- `{hostname}` - Computer hostname
+- `{year}` - Full year (2024)
+- `{month}` - Month number (8) 
+- `{month:02}` - Zero-padded month (08)
+- `{day}` - Day number (15)
+- `{day:02}` - Zero-padded day (15)
+
+Examples:
+```toml
+date_format = "{year}/{month:02}/{day:02}"                    # 2024/08/15
+date_format = "{hostname}/{year}-{month:02}"                  # laptop/2024-08  
+date_format = "archive-{year}-{month:02}-{day:02}"           # archive-2024-08-15
+```
+
+</details>
+
+## 📝 Epitaphs - Digital Memory Keeping
+
+Epitaphs are optional notes that explain why files were archived, creating a historical record of your digital archaeology:
+
+### ✍️ **Adding Epitaphs**
+
+```bash
+# During archival
+relfa archive old-logs/ --note "Log files from completed project - kept for reference"
+
+# During interactive review  
+relfa review
+# Choose (n)ote+archive and enter your explanation
+
+# Batch archival with note
+relfa archive --all --note "End of semester cleanup - keeping for historical reference"
+```
+
+### 📋 **Epitaph Format**
+
+Epitaphs are stored as `.epitaph` files containing structured metadata and your note:
+
+```
+# Epitaph for project-notes.md
+# Archived: 2024-08-02 15:30:45 UTC
+# Created: 2024-01-15 09:22:10 UTC  
+# Modified: 2024-07-28 16:45:33 UTC
+# Hostname: workstation
+
+Project planning notes from Q1 2024. Archived after project completion
+but keeping for historical reference and lessons learned documentation.
+Contains meeting notes, timeline, and final retrospective.
+```
+
+### 🔍 **Searching Epitaphs**
+
+Epitaph content is fully searchable:
+
+```bash
+# Find files by epitaph content
+relfa search "meeting notes"
+relfa search "Q1 2024"  
+relfa search "retrospective"
+
+# Case-insensitive search
+relfa search "PROJECT"  # Finds "project" in epitaphs
+```
+
+## 🎨 Usage Examples
+
+### 📊 **Daily Workflow**
+
+```bash
+#!/bin/bash
+# Daily cleanup routine
+
+echo "🧹 Daily digital cleanup started"
+
+# Check for new clutter
+relfa scan
+
+# Interactive review (optional)
+echo "Starting interactive review..."
+relfa review
+
+# Quick batch cleanup for everything else
+relfa archive --all --note "Daily cleanup - $(date +%Y-%m-%d)"
+
+echo "✨ Cleanup complete!"
+```
+
+### 🔍 **Finding Archived Content**
+
+```bash
+# Search by filename patterns
+relfa search "presentation"
+relfa search "*.pdf"
+relfa search "2024"
+
+# Search by epitaph content  
+relfa search "project alpha"
+relfa search "meeting notes"
+relfa search "semester"
+
+# Find recently archived items
+relfa search "$(date +%Y-%m-%d)"  # Today's archives
+```
+
+### 🧟‍♂️ **File Resurrection**
+
+```bash
+# Resurrect specific files
+relfa resurrect "important-document"
+
+# Interactive selection for multiple matches
+relfa resurrect "presentation"
+# Found 3 matches:
+#   1. presentation-draft.pptx
+#   2. final-presentation.pptx  
+#   3. presentation-notes.md
+# Which file to resurrect? (1-3, or 'q' to quit): 2
+
+# Files are copied back to Inbox (originals remain in graveyard)
+```
+
+### 🤖 **Automation Examples**
+
+<details>
+<summary>📜 Weekly Cleanup Script</summary>
+
+```bash
+#!/bin/bash
+# weekly-cleanup.sh
+
+WEEK=$(date +%Y-W%U)
+
+echo "🗓️  Weekly cleanup for week $WEEK"
+
+# Archive everything with weekly note
+relfa archive --all --note "Weekly cleanup for $WEEK - routine maintenance"
+
+# Show statistics
+echo "📊 Graveyard summary:"
+find ~/Graveyard -name "*.epitaph" | wc -l | xargs echo "Total archived items:"
+find ~/Graveyard -name "*.epitaph" -newer ~/Graveyard/.last-cleanup 2>/dev/null | wc -l | xargs echo "New this week:"
+
+# Update cleanup timestamp
+touch ~/Graveyard/.last-cleanup
+
+echo "✨ Weekly cleanup complete!"
+```
+
+</details>
+
+<details>
+<summary>📅 Project Archive Script</summary>
+
+```bash
+#!/bin/bash  
+# project-archive.sh PROJECT_NAME
+
+PROJECT_NAME=${1:-"unnamed-project"}
+ARCHIVE_NOTE="Project '$PROJECT_NAME' completed on $(date +%Y-%m-%d). Archiving all project files for historical reference."
+
+echo "📦 Archiving project: $PROJECT_NAME"
+
+# Archive project-related files
+relfa archive --all --note "$ARCHIVE_NOTE"
+
+echo "🔍 Searching for any remaining project files..."
+relfa search "$PROJECT_NAME"
+
+echo "✅ Project archival complete for: $PROJECT_NAME"
+```
+
+</details>
+
+## 🎯 Use Cases
+
+<table>
+<tr>
+<td width="50%">
+
+### 👩‍💼 **Professionals**
+- **Downloads cleanup**: Archive old downloads with context
+- **Project management**: Organize completed projects by timeline
+- **Document versioning**: Archive old versions with change notes
+- **Meeting materials**: Archive with meeting context and outcomes
+
+### 🎓 **Students**  
+- **Assignment organization**: Archive by semester with grades/feedback
+- **Research materials**: Keep old research accessible with context
+- **Course notes**: Archive by semester with course information
+- **Project files**: Maintain academic project history
+
+</td>
+<td width="50%">
+
+### 💻 **Developers**
+- **Log management**: Archive logs with deployment context  
+- **Build artifacts**: Archive with version and build information
+- **Backup organization**: Structure backups with project context
+- **Code samples**: Archive experimental code with learning notes
+
+### 🏠 **Home Users**
+- **Photo organization**: Archive old photos with family context
+- **Document management**: Keep important docs with life events
+- **Media collection**: Archive old media with descriptive context
+- **Digital memories**: Maintain family digital history
+
+</td>
+</tr>
+</table>
+
+## 📚 Documentation
+
+- 📖 **[Complete User Guide](https://nilp0inter.github.io/relfa/)** - Comprehensive documentation
+- 📝 **[Man Page](relfa.1)** - Complete command reference (`man relfa`)
+- 🏗️ **[API Documentation](https://docs.rs/relfa)** - For developers and contributors
+- 💡 **[Examples Repository](examples/)** - Real-world usage examples and scripts
+- ❓ **[FAQ & Troubleshooting](https://github.com/nilp0inter/relfa/wiki)** - Common questions and solutions
+
+## 🔧 Development
+
+### 🧪 **Setup Development Environment**
+
+```bash
+# Clone repository
+git clone https://github.com/nilp0inter/relfa.git
+cd relfa
+
+# Build and test
+cargo build
+cargo test --all-features
+
+# Install locally for testing
+cargo install --path .
+
+# Run with test configuration
+mkdir -p test-{inbox,graveyard,config}
+echo 'inbox = "./test-inbox"
+graveyard = "./test-graveyard"
+age_threshold_days = 1' > test-config/config.toml
+
+RELFA_CONFIG_DIR=./test-config ./target/debug/relfa scan
+```
+
+### 🏗️ **Architecture Overview**
+
+```
+src/
+├── main.rs           # CLI entry point and command routing
+├── cli.rs            # Command-line argument parsing  
+├── commands.rs       # Business logic for all commands
+├── config.rs         # Configuration management
+├── scanner.rs        # File scanning and age detection
+├── archiver.rs       # File archival and epitaph management
+├── graveyard.rs      # Search and resurrection functionality
+└── utils.rs          # Utility functions (pager, file ops)
+```
+
+### 🧪 **Testing**
+
+```bash
+# Run all tests
+cargo test
+
+# Run tests with coverage
+cargo install cargo-tarpaulin
+cargo tarpaulin --all-features
+
+# Run benchmarks
+cargo bench
+
+# Check code quality
+cargo clippy --all-targets --all-features
+cargo fmt --check
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help make Relfa even better:
+
+### 🐛 **Reporting Issues**
+
+- Use the [issue tracker](https://github.com/nilp0inter/relfa/issues)
+- Include your OS, Rust version, and configuration
+- Provide steps to reproduce the issue
+- Include relevant log output
+
+### ✨ **Submitting Features**
+
+1. Check [existing issues](https://github.com/nilp0inter/relfa/issues) for similar requests
+2. Create a detailed feature request with use cases
+3. Consider implementing it yourself (we love PRs!)
+
+### 💻 **Code Contributions**
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b amazing-feature`
+3. **Implement** your changes with tests
+4. **Test** thoroughly: `cargo test --all-features`
+5. **Format** code: `cargo fmt && cargo clippy`
+6. **Submit** a pull request with detailed description
+
+### 📝 **Documentation**
+
+- Improve README, man page, or code documentation
+- Add usage examples or tutorials  
+- Fix typos or clarify explanations
+- Translate documentation to other languages
+
+### 🎨 **Other Ways to Help**
+
+- ⭐ **Star the repository** to show your support
+- 🐦 **Share on social media** to help others discover Relfa
+- 💰 **[Sponsor the project](https://github.com/sponsors/nilp0inter)** to support development
+- 🗣️ **Provide feedback** on your user experience
+
+## 📊 Project Statistics
+
+<div align="center">
+
+![GitHub stars](https://img.shields.io/github/stars/nilp0inter/relfa?style=social)
+![GitHub forks](https://img.shields.io/github/forks/nilp0inter/relfa?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/nilp0inter/relfa?style=social)
+
+[![GitHub contributors](https://img.shields.io/github/contributors/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/graphs/contributors)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/pulse)
+[![GitHub last commit](https://img.shields.io/github/last-commit/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/commits/main)
+
+</div>
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- 💡 **Inspiration**: The endless struggle against digital entropy and the need for gentle file management
+- 🦀 **Built with Rust**: Leveraging the amazing Rust ecosystem and community
+- 🏗️ **Architecture**: Inspired by the Unix philosophy of small, composable tools
+- 🌟 **Community**: Special thanks to all contributors, users, and feedback providers
+- 📚 **Influences**: Getting Things Done methodology and digital minimalism principles
+
+## 🔮 Roadmap
+
+<details>
+<summary>🛣️ Future Plans</summary>
+
+### 🎯 **Planned Features**
+- [ ] **Web interface** for remote graveyard management
+- [ ] **Plugin system** for custom archival rules
+- [ ] **Cloud backup** integration for graveyard sync
+- [ ] **AI-powered** file categorization and epitaph suggestions
+- [ ] **Statistics dashboard** showing digital entropy over time
+- [ ] **Integration** with popular file managers
+
+### 🎨 **Quality of Life**
+- [ ] **Fuzzy search** for file resurrection
+- [ ] **Bulk epitaph editing** for multiple files
+- [ ] **Themes** for CLI output customization
+- [ ] **Multiple inbox** support for different project types
+- [ ] **Advanced notifications** with custom triggers
+
+</details>
 
 ---
 
-## Design Philosophy
+<div align="center">
 
-- **Gentle, never grim:** Your files rest safe in the graveyard; nothing is lost, and nothing is deleted without your choice.
-- **Fun and thematic:** A touch of the spooky, but always friendly—think dusty attics and cobwebs, not data loss!
-- **Minimal friction:** One command to scan or archive; always obvious what will happen next.
-- **Reversible:** Files are just moved or symlinked; you can restore anything from the graveyard by copying it out.
+**[⬆️ Back to Top](#-relfa---your-gentle-digital-gravedigger)**
 
 ---
 
-## FAQ
-
-**Q: Will Relfa delete my files?**  
-A: Never without explicit confirmation during review.
-
-**Q: What if I have identically named files?**  
-A: Files in the graveyard are uniquified using timestamps or suffixes where needed.
-
-**Q: Are symlinks safe?**  
-A: Symlinks point only to files within your own graveyard, and only if your filesystem supports them.
-
----
-
-## Roadmap / Stretch Goals
-
-- Per-item epitaphs (notes on why you buried a file!)
-- ASCII tombstone banners 🪦
-- Statistics: your digital entropy charted over time!
-- Quick resurrection: `relfa resurrect <file>`
-- File search & fuzzy find in the graveyard
-
-Open to PRs and ideas—help haunt Relfa’s future!
-
----
-
-## License
-
-MIT License.
-
----
-
-## Acknowledgements
-
-- Inspired by Getting Things Done, and the endless struggle against digital entropy.
-- Conceptual spiders, digital mothballs, and wise gravediggers everywhere.
-
----
-
-## Contributing
-
-Pull requests, bug reports, and grave ethics all welcome!
-
----
-
-## “For dust thou art, and unto dust shalt thou return.”  
+*"For dust thou art, and unto dust shalt thou return."*  
 *But maybe you'll want that markdown file again someday!*
 
----
+**Made with 🪦 and ❤️ by the Relfa community**
 
-**Happy haunting, and tidy archiving!**
+*Happy haunting, and tidy archiving!*
+
+</div>
