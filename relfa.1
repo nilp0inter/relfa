@@ -1,4 +1,4 @@
-.TH RELFA 1 "August 2025" "relfa 0.1.0" "User Commands"
+.TH RELFA 1 "August 2025" "relfa 0.2.0" "User Commands"
 .SH NAME
 relfa \- Your gentle digital gravedigger
 .SH SYNOPSIS
@@ -35,7 +35,7 @@ Start an interactive review session to process stale files one by one. For each 
 .RE
 .TP
 .B archive \fR[\fIITEM\fR] [\fIOPTIONS\fR]
-Archive files to the Graveyard.
+Archive files to the Graveyard. When called without arguments, automatically archives files older than auto_archive_threshold_days.
 .RS
 .TP
 .BI \-\-all
@@ -43,6 +43,9 @@ Archive all eligible files at once.
 .TP
 .BI \-\-note " NOTE"
 Add an epitaph (note) explaining why the file was archived.
+.TP
+.BI \-\-no-auto-archive
+Disable automatic archiving when no arguments are provided.
 .RE
 .TP
 .B resurrect \fIPATTERN\fR
@@ -66,7 +69,10 @@ Path to the directory to monitor for stale files (default: ~/Inbox).
 Path to the directory where archived files are stored (default: ~/Graveyard).
 .TP
 .B age_threshold_days
-Number of days after which files are considered stale (default: 14).
+Number of days after which files are considered stale (default: 3).
+.TP
+.B auto_archive_threshold_days
+Number of days after which files are automatically archived when running 'relfa archive' without arguments (default: 7).
 .TP
 .B notification
 Notification type: "cli" or "desktop" (default: "cli").
@@ -99,7 +105,8 @@ Each subdirectory can be configured as:
 .nf
 inbox = "/home/user/Inbox"
 graveyard = "/home/user/Graveyard"  
-age_threshold_days = 30
+age_threshold_days = 3
+auto_archive_threshold_days = 7
 notification = "desktop"
 pager = "less"
 
@@ -152,8 +159,16 @@ Start interactive review:
 .B relfa review
 
 .TP
+Auto-archive files older than threshold:
+.B relfa archive
+
+.TP
 Archive all stale files with a note:
 .B relfa archive \-\-all \-\-note "Cleaning up old project files"
+
+.TP
+Auto-archive with note:
+.B relfa archive \-\-note "Weekly cleanup"
 
 .TP
 Archive a specific file:
