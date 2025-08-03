@@ -1,9 +1,13 @@
+<div align="center">
+
 # 🪦 Relfa
 *Your gentle digital gravedigger*
 
 [![CI](https://img.shields.io/github/actions/workflow/status/nilp0inter/relfa/ci.yml?branch=main&style=flat-square)](https://github.com/nilp0inter/relfa/actions)
 [![Crates.io](https://img.shields.io/crates/v/relfa?style=flat-square)](https://crates.io/crates/relfa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
 
 ---
 
