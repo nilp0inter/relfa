@@ -1,4 +1,4 @@
-.TH RELFA 1 "August 2025" "relfa 0.2.1" "User Commands"
+.TH RELFA 1 "August 2025" "relfa 0.2.5" "User Commands"
 .SH NAME
 relfa \- Your gentle digital gravedigger
 .SH SYNOPSIS
@@ -23,7 +23,7 @@ Start an interactive review session to process stale files one by one. For each 
 .IP \(bu 2
 .B (n)ote+archive - Archive with an epitaph explaining why
 .IP \(bu 2
-.B (d)elete - Permanently delete (requires typing exact filename)
+.B (d)elete - Permanently delete (requires typing the exact filename for safety)
 .IP \(bu 2
 .B (v)iew - Show file content using configured pager
 .IP \(bu 2
@@ -35,21 +35,21 @@ Start an interactive review session to process stale files one by one. For each 
 .RE
 .TP
 .B archive \fR[\fIITEM\fR] [\fIOPTIONS\fR]
-Archive files to the Graveyard. When called without arguments, automatically archives files older than auto_archive_threshold_days.
+Archive files to the Graveyard. When called without arguments, automatically archives files older than auto_archive_threshold_days. This behavior can be disabled with the --no-auto-archive flag.
 .RS
 .TP
 .BI \-\-all
-Archive all eligible files at once.
+Archive all eligible stale files at once.
 .TP
 .BI \-\-note " NOTE"
 Add an epitaph (note) explaining why the file was archived.
 .TP
 .BI \-\-no-auto-archive
-Disable automatic archiving when no arguments are provided.
+Disable the automatic archiving behavior when no arguments are provided.
 .RE
 .TP
 .B resurrect \fIPATTERN\fR
-Search for files in the Graveyard matching PATTERN and copy them back to the Inbox. Files remain in the Graveyard (resurrection does not remove them).
+Search for files in the Graveyard matching PATTERN and copy them back to the Inbox. The original file remains in the Graveyard.
 .TP
 .B search \fIPATTERN\fR
 Search for files in the Graveyard matching PATTERN. Shows file paths and any associated epitaphs.
@@ -58,14 +58,14 @@ Search for files in the Graveyard matching PATTERN. Shows file paths and any ass
 Display current configuration settings and config file location.
 
 .SH CONFIGURATION
-Configuration is stored in a TOML file at \fB~/.config/relfa/config.toml\fR (or \fB.relfa.toml\fR as fallback).
+Configuration is stored in a TOML file at \fB~/.config/relfa/config.toml\fR.
 
 .SS Basic Settings
 .TP
 .B inbox
 Path to the directory to monitor for stale files (default: ~/Inbox).
 .TP
-.B graveyard  
+.B graveyard
 Path to the directory where archived files are stored (default: ~/Graveyard).
 .TP
 .B age_threshold_days
@@ -95,7 +95,7 @@ Each subdirectory can be configured as:
 .RS
 .IP \(bu 2
 .B original - Contains the actual file
-.IP \(bu 2  
+.IP \(bu 2
 .B symlink - Contains a symlink pointing to another subdirectory
 .IP \(bu 2
 .B nothing - Disabled (not created)
@@ -104,7 +104,7 @@ Each subdirectory can be configured as:
 .SS Example Configuration
 .nf
 inbox = "/home/user/Inbox"
-graveyard = "/home/user/Graveyard"  
+graveyard = "/home/user/Graveyard"
 age_threshold_days = 3
 auto_archive_threshold_days = 7
 notification = "desktop"
@@ -117,25 +117,25 @@ date_format = "{hostname}/{year}/{month:02}/{day:02}"
 type = "original"
 name = "created"
 
-[path_format.modified_subdir]  
+[path_format.modified_subdir]
 type = "symlink"
 name = "modified"
 target = "created"
 
 [path_format.archived_subdir]
-type = "symlink" 
+type = "symlink"
 name = "archived"
-target = "modified"
+target = "created"
 .fi
 
 .SH GRAVEYARD STRUCTURE
-Files are organized in the Graveyard using a hierarchical structure:
+Files are organized in the Graveyard using a hierarchical structure based on the default configuration:
 
 .nf
 Graveyard/
 ├── created/hostname/2025/08/02/file.txt (original)
 ├── modified/hostname/2024/02/28/file.txt -> ../../../created/...
-└── archived/hostname/2025/08/02/file.txt -> ../../../modified/...
+└── archived/hostname/2025/08/02/file.txt -> ../../../created/...
 .fi
 
 This allows you to view files organized by when they were created, last modified, or archived, while maintaining storage efficiency through symlinks.
@@ -154,7 +154,7 @@ Epitaphs follow the same symlink structure as the files themselves and are displ
 Scan for stale files:
 .B relfa scan
 
-.TP  
+.TP
 Start interactive review:
 .B relfa review
 
@@ -190,11 +190,11 @@ View current configuration:
 .TP
 .B ~/.config/relfa/config.toml
 Main configuration file (created automatically on first run).
-.TP  
+.TP
 .B ~/Inbox
 Default directory monitored for stale files.
 .TP
-.B ~/Graveyard  
+.B ~/Graveyard
 Default directory where archived files are stored.
 
 .SH ENVIRONMENT
@@ -207,7 +207,7 @@ Used as the default pager if not specified in configuration.
 exits with status 0 on success, and >0 if an error occurs.
 
 .SH AUTHOR
-Generated with Claude Code (https://claude.ai/code)
+Roberto Abdelkader Martínez Pérez <robertomartinezp@gmail.com> <https://github.com/nilp0inter>
 
 .SH SEE ALSO
 .BR find (1),

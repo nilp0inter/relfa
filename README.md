@@ -1,986 +1,397 @@
-# 🪦 Relfa - Your Gentle Digital Gravedigger
+# 🪦 Relfa
+*Your gentle digital gravedigger*
 
-<div align="center">
-
-![Relfa Banner](https://via.placeholder.com/800x200/2C3E50/ECF0F1?text=🪦+Relfa+-+Digital+File+Management+with+Love)
-
-**Keep your computer's clutter under control with loving care**
-
-[![GitHub release](https://img.shields.io/github/v/release/nilp0inter/relfa?style=flat-square)](https://github.com/nilp0inter/relfa/releases)
-[![Crates.io](https://img.shields.io/crates/v/relfa?style=flat-square)](https://crates.io/crates/relfa)
 [![CI](https://img.shields.io/github/actions/workflow/status/nilp0inter/relfa/ci.yml?branch=main&style=flat-square)](https://github.com/nilp0inter/relfa/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/nilp0inter/relfa?style=flat-square)](https://codecov.io/gh/nilp0inter/relfa)
-[![License](https://img.shields.io/github/license/nilp0inter/relfa?style=flat-square)](LICENSE)
-[![Downloads](https://img.shields.io/crates/d/relfa?style=flat-square)](https://crates.io/crates/relfa)
-
-[📦 Installation](#-installation) • [🚀 Quick Start](#-quick-start) • [✨ Features](#-features) • [📚 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
-
-_"In Relfa's Graveyard, nothing is truly lost—just waiting in gentle slumber for you, or the next digital archaeologist."_
-
-</div>
+[![Crates.io](https://img.shields.io/crates/v/relfa?style=flat-square)](https://crates.io/crates/relfa)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🌟 What is Relfa?
+Relfa scans your inbox for old files, lets you know what's gathering dust, and helps you archive it.
 
-Relfa is your **gentle digital gravedigger** that helps you maintain a clean workspace without the anxiety of permanently losing important files. Instead of aggressively deleting old files, Relfa lovingly archives them to a well-organized digital graveyard where they can rest in peace—and be easily resurrected when needed.
-
-### 🎯 Philosophy
-
-- **🕊️ Gentle Approach**: No aggressive deletions, just loving archival
-- **🔍 Smart Detection**: Identifies files that haven't been touched recently
-- **🗃️ Organized Storage**: Creates a structured graveyard with multiple time-based views
-- **🧟‍♂️ Easy Resurrection**: Bring back archived files when you need them
-- **📝 Memory Keeping**: Add epitaphs explaining why files were archived
-- **🔗 Efficient Links**: Uses symlinks to provide multiple organizational views without file duplication
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🎮 **Interactive Review**
-
-- Multi-action interface: archive, delete, view, open, skip
-- Safety confirmations for destructive actions
-- Real-time file preview with configurable pager
-- Desktop application integration
-
-### 🗃️ **Flexible Archival System**
-
-- Smart organization by creation/modification/archival dates
-- Efficient symlink-based storage
-- Configurable graveyard structure
-- Cross-platform support (Linux, macOS, Windows)
-
-</td>
-<td width="50%">
-
-### 🔍 **Powerful Search**
-
-- Filename pattern matching
-- Content search within epitaph notes
-- Visual indicators for match sources
-- Smart deduplication
-
-### 📱 **Modern UX**
-
-- Desktop notifications
-- Configurable pager support
-- Rich emoji-enhanced CLI output
-- Comprehensive man page
-
-</td>
-</tr>
-</table>
-
-## 🚀 Installation
-
-### 📦 **Quick Install**
-
-<table>
-<tr>
-<td><strong>🦀 Cargo</strong></td>
-<td><code>cargo install relfa</code></td>
-</tr>
-<tr>
-<td><strong>🍺 Homebrew</strong></td>
-<td><code>brew install relfa</code></td>
-</tr>
-<tr>
-<td><strong>🐧 Arch Linux</strong></td>
-<td><code>yay -S relfa</code></td>
-</tr>
-<tr>
-<td><strong>🐳 Docker</strong></td>
-<td><code>docker run --rm -v $(pwd):/workspace ghcr.io/nilp0inter/relfa:latest scan</code></td>
-</tr>
-</table>
-
-### 📥 **Pre-built Binaries**
-
-Download the latest release for your platform from [GitHub Releases](https://github.com/nilp0inter/relfa/releases):
-
-```bash
-# Linux (x86_64)
-curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-linux-x86_64.tar.gz | tar xz
-sudo mv relfa /usr/local/bin/
-
-# macOS (Intel)
-curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-macos-x86_64.tar.gz | tar xz
-sudo mv relfa /usr/local/bin/
-
-# macOS (Apple Silicon)
-curl -L https://github.com/nilp0inter/relfa/releases/latest/download/relfa-macos-aarch64.tar.gz | tar xz
-sudo mv relfa /usr/local/bin/
-
-# Windows
-# Download relfa-windows-x86_64.zip and extract to your PATH
-```
-
-### 📖 **Man Page Installation**
-
-```bash
-sudo cp relfa.1 /usr/local/share/man/man1/
-sudo mandb
-man relfa  # View the manual
-```
-
-## 🏃‍♂️ Quick Start
-
-### 1. 🔧 **Initial Setup**
-
-```bash
-# View current configuration
-relfa config
-
-# Scan your inbox for stale files
-relfa scan
-```
-
-<details>
-<summary>📋 Expected Output</summary>
-
-```
+```sh
+$ relfa scan
 🕷️  Scanning Inbox for dusty files...
-☠️  3 items in ~/Inbox are gathering dust:
+☠️  2 items in ~/Inbox are gathering dust:
    📄 "old-document.pdf" (file) - last touched 5 days ago (2025-07-29)
    📄 "project-archive/" (folder) - last touched 4 days ago (2025-07-30)
-   📄 "temp-notes.txt" (file) - last touched 10 days ago (2025-07-24)
 
 🤖 1 item is eligible for auto-archiving (older than 7 days):
    📄 "temp-notes.txt" (file) - last touched 10 days ago (2025-07-24)
    ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!
 
 💡 Run 'relfa review' to interactively deal with these items
-   or 'relfa archive' to auto-archive old files (or 'relfa archive --all' for all).
+   or 'relfa archive' to auto-archive old files.
 ```
+
+---
+
+<!-- Non-technical stuff -->
+
+## Motivation
+
+In our daily digital lives, we constantly download, capture, and create small bursts of information — a PDF here, a draft note there, a temporary screenshot, today’s meeting summary. We save them quickly, intending to return later to tidy things up. But “later” rarely comes, and before long our computers fill with forgotten files and disorganized corners of digital clutter.
+
+Relfa is the gentle gravedigger for your digital workspace. When a file begins to gather dust, it doesn't act hastily. First, it offers a quiet reminder—a chance for you to decide if the file's time has come. If it continues to sit untouched, Relfa then performs its final, gentle duty: respectfully moving the file to a well-organized graveyard. This two-step process ensures that archival is an intentional choice, not an accident, keeping your active workspace for the living, not the forgotten.
+
+This tool isn’t about perfection. It’s about being present for what we’ve discarded and giving ourselves another chance to choose what stays.
+
+## Features
+
+-   **Dual-Threshold System**: Relfa uses two time limits. A "soft" threshold gently notifies you of stale files, while a "hard" threshold automatically archives them, keeping your workspace tidy without constant intervention.
+-   **Flexible Archival**: Files are stored in a highly-organized "graveyard." Using symlinks, you can browse archived files by their creation, modification, or archival date, all without duplicating a single file.
+-   **Interactive Review**: For files that need a personal touch, the `review` command lets you process them one-by-one with options to archive, delete, view, open, or skip.
+-   **Epitaphs for Posterity**: When archiving, you can attach an "epitaph" — a note explaining the file's context. These notes are stored alongside the file and are fully searchable.
+-   **Powerful Search & Resurrection**: Easily find archived files by searching filenames or epitaph content. The `resurrect` command brings files back from the graveyard to your inbox.
+-   **Declarative & Automated**: Full support for Nix and Home Manager allows for declarative configuration and automated execution with systemd timers.
+-   **Desktop Integration**: Get desktop notifications for scan results and open files directly in their default applications.
+
+## Usage
+
+<details>
+<summary><strong>Scanning for Stale Files</strong></summary>
+
+To see which files in your inbox have exceeded the `age_threshold_days`, run:
+
+```sh
+relfa scan
+```
+
+This will print a list of "stale" files and another list of files that are old enough to be auto-archived. This command is read-only and will not modify any files.
 
 </details>
 
-### 2. 🔍 **Interactive Review**
+<details>
+<summary><strong>Interactive Review</strong></summary>
 
-```bash
+For a guided, one-by-one review of your stale files, run:
+
+```sh
 relfa review
 ```
 
-The interactive review gives you options for each file:
+For each file, you will be prompted to choose an action:
 
-| Command              | Action                  | Description                                |
-| -------------------- | ----------------------- | ------------------------------------------ |
-| **`(a)rchive`**      | 🗃️ Archive              | Move to graveyard without note             |
-| **`(n)ote+archive`** | 📝 Archive with epitaph | Add explanatory note                       |
-| **`(d)elete`**       | 🗑️ Delete               | Permanent deletion (requires confirmation) |
-| **`(v)iew`**         | 👀 View                 | Preview content with pager                 |
-| **`(o)pen`**         | 🚀 Open                 | Open with default application              |
-| **`(s)kip`**         | ⏭️ Skip                 | Skip for now                               |
-| **`(q)uit`**         | 🚪 Quit                 | Exit review session                        |
-
-### 3. 📦 **Batch Operations**
-
-```bash
-# Archive all stale files at once
-relfa archive --all
-
-# Archive specific file with explanation
-relfa archive old-document.pdf --note "Outdated project specification from Q1"
-
-# Archive with batch note
-relfa archive --all --note "Weekly cleanup - $(date +%Y-%m-%d)"
-```
-
-### 🤖 **Auto-Archive Feature**
-
-Relfa can automatically archive files that exceed the auto-archive threshold when you run `relfa archive` without arguments:
-
-```bash
-# Automatically archive files older than auto_archive_threshold_days (default: 7 days)
-relfa archive
-
-# Disable auto-archiving (shows help message instead)
-relfa archive --no-auto-archive
-
-# Auto-archive with a note
-relfa archive --note "Automated cleanup - $(date +%Y-%m-%d)"
-```
-
-The scan command will warn you about files eligible for auto-archiving:
-
-```
-🕷️  Scanning Inbox for dusty files...
-☠️  2 items in ~/Inbox are gathering dust:
-   📄 "document.pdf" (file) - last touched 5 days ago (2025-07-29)
-   📄 "old-file.txt" (file) - last touched 10 days ago (2025-07-24)
-
-🤖 1 item is eligible for auto-archiving (older than 7 days):
-   📄 "old-file.txt" (file) - last touched 10 days ago (2025-07-24)
-   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!
-```
-
-### 5. 🔍 **Search & Resurrection**
-
-```bash
-# Search in graveyard (searches filenames AND epitaph content)
-relfa search "project"
-
-# Search by epitaph content
-relfa search "meeting notes"
-
-# Resurrect files back to inbox
-relfa resurrect "important-file"
-```
-
-<details>
-<summary>📋 Search Output Example</summary>
-
-```
-🔍 Searching for 'project' in the Graveyard...
-Found 2 matches in the Graveyard:
-  📄 created/laptop/2024/07/15/project-alpha-notes.md
-     💭 "Meeting notes from project alpha kickoff"
-  📄 created/laptop/2024/06/20/project-proposal.pdf
-     💭 "Initial proposal document - archived after approval" 🔍
-```
-
-The 🔍 emoji indicates the match was found in the epitaph content, not the filename.
+-   `(a)rchive`: Move the file to the graveyard.
+-   `(n)ote+archive`: Archive the file and attach an epitaph (a descriptive note).
+-   `(d)elete`: Permanently delete the file (requires confirmation).
+-   `(v)iew`: Preview the file's content using your configured pager.
+-   `(o)pen`: Open the file with its default application.
+-   `(s)kip`: Do nothing and move to the next file.
+-   `(q)uit`: Exit the review session.
 
 </details>
 
-## 🏗️ Graveyard Structure
+<details>
+<summary><strong>Archiving Files</strong></summary>
 
-Relfa creates an elegantly organized graveyard structure:
+The `archive` command is flexible and has several modes.
 
-```
-~/Graveyard/
-├── created/hostname/2024/08/02/     # Organized by creation date
-│   ├── document.pdf                 # 📄 Original file
-│   └── document.pdf.epitaph         # 📝 Optional note
-├── modified/hostname/2024/07/15/    # Organized by modification date
-│   ├── document.pdf@ → ../created/  # 🔗 Symlink to original
-│   └── document.pdf.epitaph@ →      # 🔗 Symlink to epitaph
-└── archived/hostname/2024/08/02/    # Organized by archival date
-    ├── document.pdf@ → ../modified/ # 🔗 Symlink chain
-    └── document.pdf.epitaph@ →      # 🔗 Follows same pattern
-```
+#### Auto-Archiving
 
-This structure provides:
+To automatically archive all files that have exceeded the `auto_archive_threshold_days`, simply run `archive` with no arguments:
 
-- 📅 **Browse by creation date**: Find files by when they were originally created
-- ✏️ **Browse by modification date**: See files by when they were last changed
-- 🗃️ **Browse by archival date**: Review recently archived items
-- 💾 **Efficient storage**: Symlinks prevent duplication while providing multiple views
-- 🔍 **Consistent organization**: Epitaphs follow the same symlink structure as files
+```sh
+# Archives all files older than the "hard limit" threshold.
+relfa archive
 
-## ⚙️ Configuration
-
-Relfa uses a TOML configuration file at `~/.config/relfa/config.toml`:
-
-```toml
-# Basic settings
-inbox = "/home/user/Inbox"
-graveyard = "/home/user/Graveyard"
-age_threshold_days = 3               # Files older than this show as "stale"
-auto_archive_threshold_days = 7      # Files older than this auto-archive when running 'relfa archive'
-notification = "desktop"             # "desktop" or "cli"
-pager = "less"                      # "less", "bat", "more", etc.
-
-[path_format]
-date_format = "{hostname}/{year}/{month:02}/{day:02}"
-
-# Flexible subdirectory configuration
-[path_format.created_subdir]
-type = "original"    # Contains actual files
-name = "created"
-
-[path_format.modified_subdir]
-type = "symlink"     # Contains symlinks
-name = "modified"
-target = "created"   # Points to created subdir
-
-[path_format.archived_subdir]
-type = "symlink"
-name = "archived"
-target = "modified"  # Creates chain: archived → modified → created
+# You can also add a note to all auto-archived files.
+relfa archive --note "Weekly automated cleanup"
 ```
 
-### 🎛️ **Advanced Configuration Options**
+#### Archiving Specific Files or All Stale Files
+
+```sh
+# Archive a single, specific item from your inbox.
+relfa archive "my-old-document.pdf" --note "Final version, no longer needed."
+
+# Archive all stale files (those older than the "soft limit").
+relfa archive --all
+```
+
+</details>
 
 <details>
-<summary>🔧 Subdirectory Types</summary>
+<summary><strong>Searching the Graveyard</strong></summary>
 
-Each subdirectory can be configured as:
+To find files you've already archived, use the `search` command. It searches both filenames and epitaph content.
 
-- **`original`** - Contains the actual files
-- **`symlink`** - Contains symlinks pointing to another subdirectory
-- **`nothing`** - Disabled (not created)
-
-Example configurations:
-
-```toml
-# Minimal: Only organize by creation date
-[path_format.created_subdir]
-type = "original"
-name = "by-creation"
-
-[path_format.modified_subdir]
-type = "nothing"
-
-[path_format.archived_subdir]
-type = "nothing"
+```sh
+relfa search "project-alpha"
 ```
 
+</details>
+
+<details>
+<summary><strong>Resurrecting Files</strong></summary>
+
+To bring a file back from the graveyard to your inbox, use `resurrect`. This copies the file back, leaving the original in the graveyard.
+
+```sh
+relfa resurrect "important-document.pdf"
+```
+
+If your search term matches multiple files, Relfa will present a list for you to choose from.
+
+</details>
+
+<!-- Technical stuff -->
+
+## Installation
+
+<details>
+<summary><strong>From Source (via Nix)</strong></summary>
+
+The recommended way to use Relfa is declaratively through its **Home Manager module**, which allows for easy configuration and automated execution. See the `Home Manager Configuration` section for details.
+
+For quick trials or environments without Home Manager, you can use one of the following `nix` commands:
+
+**Temporary Execution**
+
+To run Relfa without installing it, use `nix run`:
+
+```sh
+nix run github:nilp0inter/relfa -- [command]
+# Example:
+nix run github:nilp0inter/relfa -- scan
+```
+
+**Persistent Installation**
+
+To install Relfa into your user profile, making it available in your shell, run:
+
+```sh
+nix profile install github:nilp0inter/relfa
+```
+
+</details>
+
+<details>
+<summary><strong>From Crates.io (via Cargo)</strong></summary>
+
+If you have the Rust toolchain installed on your system, you can install Relfa directly from `crates.io` using `cargo`:
+
+```sh
+cargo install relfa
+```
+
+This command will download the source code, compile it, and place the `relfa` binary in your Cargo binary path (`~/.cargo/bin/`), which should be in your system's `PATH`.
+
+</details>
+
+<details>
+<summary><strong>Pre-compiled Binaries</strong></summary>
+
+At the moment, pre-compiled binaries are not officially provided. I am waiting to see if there is sufficient user interest before setting up a build pipeline for different platforms.
+
+If you would like to see official binaries for your operating system (e.g., Linux x86_64, macOS, Windows), please **[open an issue on GitHub](https://github.com/nilp0inter/relfa/issues)**. This will help me gauge demand and prioritize which platforms to support.
+
+</details>
+
+## Configuration
+
+<details>
+<summary><strong>Manual Configuration</strong></summary>
+
+Relfa is configured via a TOML file located at `~/.config/relfa/config.toml`.
+
+You can generate a configuration file with default values by running:
+
+```sh
+relfa config
+```
+
+This will create the file if it doesn't exist and print the current settings.
+
+#### Example `config.toml`
+
 ```toml
-# Complex chain: created → modified → archived
+# Path to the directory you want Relfa to monitor.
+inbox = "/home/user/Inbox"
+
+# Path to the directory where archived files will be stored.
+graveyard = "/home/user/Graveyard"
+
+# (Soft limit) Files older than this (in days) are considered "stale"
+# and will be shown during a `scan` or `review`.
+age_threshold_days = 3
+
+# (Hard limit) Files older than this (in days) will be automatically
+# archived when you run `relfa archive` without any arguments.
+auto_archive_threshold_days = 7
+
+# How to deliver notifications. Can be "cli" or "desktop".
+notification = "desktop"
+
+# The command to use for viewing files with the `review` command.
+# Defaults to your $PAGER environment variable, or "less".
+pager = "less"
+
+# Configuration for the graveyard's directory structure.
+[path_format]
+# A template for creating date-based paths.
+# Available variables: {hostname}, {year}, {month}, {day}, {month:02}, {day:02}
+date_format = "{hostname}/{year}/{month:02}/{day:02}"
+
+# Defines a subdirectory for organizing files by their creation date.
+# `type = "original"` means the actual files are stored here.
 [path_format.created_subdir]
 type = "original"
 name = "created"
 
+# Defines a subdirectory for organizing files by their modification date.
+# `type = "symlink"` means this directory will contain symbolic links.
+# `target = "created"` means the links will point to the files in the "created" subdirectory.
 [path_format.modified_subdir]
 type = "symlink"
 name = "modified"
 target = "created"
 
+# Defines a subdirectory for organizing files by their archival date.
+# In this example, this view is disabled.
 [path_format.archived_subdir]
-type = "symlink"
-name = "archived"
-target = "modified"
+type = "nothing"
 ```
 
 </details>
 
 <details>
-<summary>📅 Date Format Options</summary>
+<summary><strong>Home Manager Configuration</strong></summary>
 
-The `date_format` supports these placeholders:
+For users of [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix-community/home-manager), Relfa provides a module for declarative configuration.
 
-- `{hostname}` - Computer hostname
-- `{year}` - Full year (2024)
-- `{month}` - Month number (8)
-- `{month:02}` - Zero-padded month (08)
-- `{day}` - Day number (15)
-- `{day:02}` - Zero-padded day (15)
+1.  **Add the flake to your inputs:**
 
-Examples:
+    ```nix
+    # flake.nix
+    {
+      inputs = {
+        relfa.url = "github:nilp0inter/relfa";
+        # ... other inputs
+      };
+    }
+    ```
 
-```toml
-date_format = "{year}/{month:02}/{day:02}"                    # 2024/08/15
-date_format = "{hostname}/{year}-{month:02}"                  # laptop/2024-08
-date_format = "archive-{year}-{month:02}-{day:02}"           # archive-2024-08-15
-```
+2.  **Import the module in your `home.nix`:**
 
-</details>
+    ```nix
+    { inputs, ... }: {
+      imports = [ inputs.relfa.homeManagerModules.relfa ];
+    }
+    ```
 
-## ❄️ Nix Flake Usage
+3.  **Configure Relfa:**
 
-Relfa provides a comprehensive Nix flake with packages and Home Manager modules for declarative configuration and automation.
+    The `programs.relfa.settings` block is required for the program to run. Note that the `path_format` section and its sub-sections are also mandatory.
 
-### 📦 **Package Installation**
+    ```nix
+    # home.nix
+    programs.relfa = {
+      enable = true;
 
-#### Direct Usage
+      settings = {
+        inbox = "${config.home.homeDirectory}/Downloads";
+        graveyard = "${config.home.homeDirectory}/Archive";
+        age_threshold_days = 5;
+        auto_archive_threshold_days = 14;
+        notification = "desktop";
 
-```bash
-# Run relfa directly from the flake
-nix run github:nilp0inter/relfa
+        # The `path_format` block is required.
+        path_format = {
+          date_format = "{hostname}/{year}/{month:02}/{day:02}";
+          created_subdir = {
+            type = "original";
+            name = "created";
+          };
+          modified_subdir = {
+            type = "symlink";
+            name = "modified";
+            target = "created";
+          };
+          archived_subdir = {
+            type = "symlink";
+            name = "archived";
+            target = "created";
+          };
+        };
+      };
 
-# Install to user profile
-nix profile install github:nilp0inter/relfa
-
-# Use in a development shell
-nix shell github:nilp0inter/relfa
-```
-
-#### In a Nix System Configuration
-
-```nix
-{
-  inputs.relfa.url = "github:nilp0inter/relfa";
-
-  # In your system configuration
-  environment.systemPackages = [ inputs.relfa.packages.${system}.relfa ];
-}
-```
-
-### 🏠 **Home Manager Integration**
-
-#### Basic Configuration
-
-```nix
-{
-  inputs.relfa.url = "github:nilp0inter/relfa";
-
-  # In your home.nix:
-  imports = [ inputs.relfa.homeManagerModules.relfa ];
-
-  programs.relfa = {
-    enable = true;
-    settings = {
-      age_threshold_days = 5;
-      auto_archive_threshold_days = 14;
-      notification = "desktop";
-      inbox = "${config.home.homeDirectory}/Downloads";
-      graveyard = "${config.home.homeDirectory}/Archive";
-      
-      # Required path_format section
-      path_format = {
-        date_format = "{hostname}/{year}/{month:02}/{day:02}";
-        created_subdir = { type = "original"; name = "created"; };
-        modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
-        archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
+      # Optional: Enable a systemd timer for automated execution.
+      timer = {
+        enable = true;
+        # Run `relfa scan` daily.
+        command = "scan";
+        frequency = "daily";
+        # Add a random delay to avoid running at the exact same time as other services.
+        randomizedDelay = "1h";
       };
     };
-  };
-}
-```
+    ```
 
-### ⏰ **Automated Execution with Systemd Timer**
+#### Timer Options
 
-#### Hourly Scan and Auto-Archive (Recommended)
+The `timer` submodule allows you to automate Relfa's execution.
 
-```nix
-programs.relfa = {
-  enable = true;
-
-  # Configure desktop notifications and settings
-  settings = {
-    notification = "desktop";
-    age_threshold_days = 3;
-    auto_archive_threshold_days = 7;
-    inbox = "${config.home.homeDirectory}/Inbox";
-    graveyard = "${config.home.homeDirectory}/Graveyard";
-    
-    # Required path_format section
-    path_format = {
-      date_format = "{hostname}/{year}/{month:02}/{day:02}";
-      created_subdir = { type = "original"; name = "created"; };
-      modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
-      archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
-    };
-  };
-
-  # Systemd timer configuration
-  timer = {
-    enable = true;
-    frequency = "hourly";                # Run every hour
-    command = "scan-then-archive";       # First scan, then auto-archive
-    randomizedDelay = "15m";            # Random delay up to 15 minutes
-  };
-};
-```
-
-#### Daily Scan Only (Non-Destructive)
-
-```nix
-programs.relfa = {
-  enable = true;
-  settings = {
-    notification = "desktop";
-    
-    # Required path_format section
-    path_format = {
-      date_format = "{hostname}/{year}/{month:02}/{day:02}";
-      created_subdir = { type = "original"; name = "created"; };
-      modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
-      archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
-    };
-  };
-
-  timer = {
-    enable = true;
-    frequency = "daily";
-    command = "scan";                   # Only scan and notify
-    randomizedDelay = "1h";
-  };
-};
-```
-
-#### Custom Schedule Examples
-
-```nix
-timer = {
-  enable = true;
-
-  # Every 30 minutes
-  frequency = "*:0/30";
-
-  # Every 6 hours
-  frequency = "0/6:00:00";
-
-  # Weekdays at 9 AM
-  frequency = "Mon..Fri 09:00:00";
-
-  # Daily at 2 PM with 2-hour random delay
-  frequency = "daily";
-  randomizedDelay = "2h";
-};
-```
-
-### 🎛️ **Configuration Options**
-
-<details>
-<summary>📋 Complete Configuration Reference</summary>
-
-```nix
-programs.relfa = {
-  enable = true;
-
-  # Package override (optional)
-  package = inputs.relfa.packages.${pkgs.system}.relfa;
-
-  # Core settings
-  settings = {
-    inbox = "${config.home.homeDirectory}/Inbox";
-    graveyard = "${config.home.homeDirectory}/Graveyard";
-    age_threshold_days = 3;              # Files show as "stale"
-    auto_archive_threshold_days = 7;     # Files auto-archive
-    notification = "desktop";            # "cli" or "desktop"
-    pager = "bat";                      # File viewer command
-
-    # Path format configuration (optional - uses defaults if not specified)
-    path_format = {
-      date_format = "{hostname}/{year}/{month:02}/{day:02}";
-      
-      created_subdir = {
-        type = "original";
-        name = "created";
-      };
-      
-      modified_subdir = {
-        type = "symlink";
-        name = "modified";
-        target = "created";
-      };
-      
-      archived_subdir = {
-        type = "symlink";
-        name = "archived";
-        target = "modified";
-      };
-    };
-  };
-
-  # Systemd timer (optional)
-  timer = {
-    enable = true;
-    frequency = "daily";                # systemd OnCalendar format
-    command = "scan-then-archive";      # "scan", "archive", "scan-then-archive"
-    randomizedDelay = "1h";            # Prevent simultaneous execution
-  };
-};
-```
+-   `command`: Which command to run. Can be `"scan"`, `"archive"`, or `"scan-then-archive"`.
+-   `frequency`: How often to run the command. Accepts `systemd.time` calendar event formats (e.g., `"daily"`, `"hourly"`, `"*:0/30"` for every 30 minutes).
+-   `randomizedDelay`: A random delay to add before execution (e.g., `"1h"`, `"30m"`).
 
 </details>
 
-### 🔔 **Notification Examples**
-
-#### What You'll See with Timer Enabled:
-
-- **Scan results**: `🔍 Scan Complete: 2 files gathering dust in Inbox`
-- **Auto-archive warnings**: `🤖 Auto-archived 1 file to Graveyard (old-document.pdf)`
-- **Clean state**: `✨ No files need attention - Inbox is clean!`
-
-### 🚀 **Getting Started with Nix**
-
-1. **Add relfa to your flake inputs:**
-
-   ```nix
-   inputs.relfa.url = "github:nilp0inter/relfa";
-   ```
-
-2. **Import the Home Manager module:**
-
-   ```nix
-   imports = [ inputs.relfa.homeManagerModules.relfa ];
-   ```
-
-3. **Enable with basic configuration:**
-
-   ```nix
-   programs.relfa.enable = true;
-   ```
-
-4. **Rebuild your system:**
-
-   ```bash
-   home-manager switch  # For home-manager
-   # or
-   nixos-rebuild switch  # For NixOS
-   ```
-
-5. **Check timer status:**
-   ```bash
-   systemctl --user status relfa.timer
-   systemctl --user status relfa.service
-   ```
-
-The Nix flake provides a **zero-configuration** setup that works out of the box, with full **declarative control** over all settings and automation!
-
-## 📝 Epitaphs - Digital Memory Keeping
-
-Epitaphs are optional notes that explain why files were archived, creating a historical record of your digital archaeology:
-
-### ✍️ **Adding Epitaphs**
-
-```bash
-# During archival
-relfa archive old-logs/ --note "Log files from completed project - kept for reference"
-
-# During interactive review
-relfa review
-# Choose (n)ote+archive and enter your explanation
-
-# Batch archival with note
-relfa archive --all --note "End of semester cleanup - keeping for historical reference"
-```
-
-### 📋 **Epitaph Format**
-
-Epitaphs are stored as `.epitaph` files containing structured metadata and your note:
-
-```
-# Epitaph for project-notes.md
-# Archived: 2024-08-02 15:30:45 UTC
-# Created: 2024-01-15 09:22:10 UTC
-# Modified: 2024-07-28 16:45:33 UTC
-# Hostname: workstation
-
-Project planning notes from Q1 2024. Archived after project completion
-but keeping for historical reference and lessons learned documentation.
-Contains meeting notes, timeline, and final retrospective.
-```
-
-### 🔍 **Searching Epitaphs**
-
-Epitaph content is fully searchable:
-
-```bash
-# Find files by epitaph content
-relfa search "meeting notes"
-relfa search "Q1 2024"
-relfa search "retrospective"
-
-# Case-insensitive search
-relfa search "PROJECT"  # Finds "project" in epitaphs
-```
-
-## 🎨 Usage Examples
-
-### 📊 **Daily Workflow**
-
-```bash
-#!/bin/bash
-# Daily cleanup routine
-
-echo "🧹 Daily digital cleanup started"
-
-# Check for new clutter
-relfa scan
-
-# Interactive review (optional)
-echo "Starting interactive review..."
-relfa review
-
-# Quick batch cleanup for everything else
-relfa archive --all --note "Daily cleanup - $(date +%Y-%m-%d)"
-
-echo "✨ Cleanup complete!"
-```
-
-### 🔍 **Finding Archived Content**
-
-```bash
-# Search by filename patterns
-relfa search "presentation"
-relfa search "*.pdf"
-relfa search "2024"
-
-# Search by epitaph content
-relfa search "project alpha"
-relfa search "meeting notes"
-relfa search "semester"
-
-# Find recently archived items
-relfa search "$(date +%Y-%m-%d)"  # Today's archives
-```
-
-### 🧟‍♂️ **File Resurrection**
-
-```bash
-# Resurrect specific files
-relfa resurrect "important-document"
-
-# Interactive selection for multiple matches
-relfa resurrect "presentation"
-# Found 3 matches:
-#   1. presentation-draft.pptx
-#   2. final-presentation.pptx
-#   3. presentation-notes.md
-# Which file to resurrect? (1-3, or 'q' to quit): 2
-
-# Files are copied back to Inbox (originals remain in graveyard)
-```
-
-### 🤖 **Automation Examples**
+## Development
 
 <details>
-<summary>📜 Weekly Cleanup Script</summary>
+<summary><strong>Setup and Workflow</strong></summary>
 
-```bash
-#!/bin/bash
-# weekly-cleanup.sh
+The official and recommended development setup for Relfa uses [Nix](https://nixos.org/) and [Direnv](https://direnv.net/). While other setups are possible, they are not officially supported and are left to the user's discretion.
 
-WEEK=$(date +%Y-W%U)
+### Prerequisites
 
-echo "🗓️  Weekly cleanup for week $WEEK"
+Before you begin, ensure you have both Nix and Direnv installed on your system.
 
-# Archive everything with weekly note
-relfa archive --all --note "Weekly cleanup for $WEEK - routine maintenance"
+### Setup
 
-# Show statistics
-echo "📊 Graveyard summary:"
-find ~/Graveyard -name "*.epitaph" | wc -l | xargs echo "Total archived items:"
-find ~/Graveyard -name "*.epitaph" -newer ~/Graveyard/.last-cleanup 2>/dev/null | wc -l | xargs echo "New this week:"
+Setting up the development environment is a one-step process. Simply navigate to the project's root directory in your terminal and run:
 
-# Update cleanup timestamp
-touch ~/Graveyard/.last-cleanup
-
-echo "✨ Weekly cleanup complete!"
+```sh
+direnv allow
 ```
+
+This command will trigger the Nix flake to build the complete development environment. It automatically:
+
+-   Downloads and installs all necessary dependencies (Rust toolchain, etc.).
+-   Configures and installs the required Git hooks.
+-   Activates a `devshell` with pre-configured aliases for common tasks (build, test, format, etc.).
+
+### Workflow
+
+Once the environment is active, you will have access to a `devshell` menu with commands for building, testing, and formatting the code.
+
+The installed Git hooks will run automatically on every commit. These hooks check for correct formatting and ensure the project compiles, helping to guarantee that your changes will pass the CI pipeline.
 
 </details>
 
-<details>
-<summary>📅 Project Archive Script</summary>
+<!-- Community stuff -->
 
-```bash
-#!/bin/bash
-# project-archive.sh PROJECT_NAME
+## Community
 
-PROJECT_NAME=${1:-"unnamed-project"}
-ARCHIVE_NOTE="Project '$PROJECT_NAME' completed on $(date +%Y-%m-%d). Archiving all project files for historical reference."
+### Contributing
 
-echo "📦 Archiving project: $PROJECT_NAME"
+Contributions are welcome, but please follow these guidelines to ensure a smooth process.
 
-# Archive project-related files
-relfa archive --all --note "$ARCHIVE_NOTE"
+-   **Reporting Issues**: If you find a bug, please [open an issue](https://github.com/nilp0inter/relfa/issues). Include your OS, Relfa version, and clear steps to reproduce the problem.
+-   **Feature Requests**: If you have an idea for a new feature, please [open an issue](https://github.com/nilp0inter/relfa/issues) to start a discussion. **Please do not submit a pull request for a new feature without prior discussion and approval in an issue.**
+-   **Code Contributions**:
+    -   Pull requests are welcome for **bug fixes only**.
+    -   Your pull request **must** include tests that demonstrate the bug and verify your fix.
+    -   To contribute:
+        1.  Fork the repository.
+        2.  Create a branch for your fix (`git checkout -b fix/some-bug`).
+        3.  Implement your changes and add corresponding tests.
+        4.  Submit a pull request that links to the relevant issue.
 
-echo "🔍 Searching for any remaining project files..."
-relfa search "$PROJECT_NAME"
+<!-- Legal stuff -->
 
-echo "✅ Project archival complete for: $PROJECT_NAME"
-```
+## Legal
 
-</details>
-
-## 🎯 Use Cases
-
-<table>
-<tr>
-<td width="50%">
-
-### 👩‍💼 **Professionals**
-
-- **Downloads cleanup**: Archive old downloads with context
-- **Project management**: Organize completed projects by timeline
-- **Document versioning**: Archive old versions with change notes
-- **Meeting materials**: Archive with meeting context and outcomes
-
-### 🎓 **Students**
-
-- **Assignment organization**: Archive by semester with grades/feedback
-- **Research materials**: Keep old research accessible with context
-- **Course notes**: Archive by semester with course information
-- **Project files**: Maintain academic project history
-
-</td>
-<td width="50%">
-
-### 💻 **Developers**
-
-- **Log management**: Archive logs with deployment context
-- **Build artifacts**: Archive with version and build information
-- **Backup organization**: Structure backups with project context
-- **Code samples**: Archive experimental code with learning notes
-
-### 🏠 **Home Users**
-
-- **Photo organization**: Archive old photos with family context
-- **Document management**: Keep important docs with life events
-- **Media collection**: Archive old media with descriptive context
-- **Digital memories**: Maintain family digital history
-
-</td>
-</tr>
-</table>
-
-## 📚 Documentation
-
-- 📖 **[Complete User Guide](https://nilp0inter.github.io/relfa/)** - Comprehensive documentation
-- 📝 **[Man Page](relfa.1)** - Complete command reference (`man relfa`)
-- 🏗️ **[API Documentation](https://docs.rs/relfa)** - For developers and contributors
-- 💡 **[Examples Repository](examples/)** - Real-world usage examples and scripts
-- ❓ **[FAQ & Troubleshooting](https://github.com/nilp0inter/relfa/wiki)** - Common questions and solutions
-
-## 🔧 Development
-
-### 🧪 **Setup Development Environment**
-
-```bash
-# Clone repository
-git clone https://github.com/nilp0inter/relfa.git
-cd relfa
-
-# Build and test
-cargo build
-cargo test --all-features
-
-# Install locally for testing
-cargo install --path .
-
-# Run with test configuration
-mkdir -p test-{inbox,graveyard,config}
-echo 'inbox = "./test-inbox"
-graveyard = "./test-graveyard"
-age_threshold_days = 1' > test-config/config.toml
-
-RELFA_CONFIG_DIR=./test-config ./target/debug/relfa scan
-```
-
-### 🏗️ **Architecture Overview**
-
-```
-src/
-├── main.rs           # CLI entry point and command routing
-├── cli.rs            # Command-line argument parsing
-├── commands.rs       # Business logic for all commands
-├── config.rs         # Configuration management
-├── scanner.rs        # File scanning and age detection
-├── archiver.rs       # File archival and epitaph management
-├── graveyard.rs      # Search and resurrection functionality
-└── utils.rs          # Utility functions (pager, file ops)
-```
-
-### 🧪 **Testing**
-
-```bash
-# Run all tests
-cargo test
-
-# Run tests with coverage
-cargo install cargo-tarpaulin
-cargo tarpaulin --all-features
-
-# Run benchmarks
-cargo bench
-
-# Check code quality
-cargo clippy --all-targets --all-features
-cargo fmt --check
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help make Relfa even better:
-
-### 🐛 **Reporting Issues**
-
-- Use the [issue tracker](https://github.com/nilp0inter/relfa/issues)
-- Include your OS, Rust version, and configuration
-- Provide steps to reproduce the issue
-- Include relevant log output
-
-### ✨ **Submitting Features**
-
-1. Check [existing issues](https://github.com/nilp0inter/relfa/issues) for similar requests
-2. Create a detailed feature request with use cases
-3. Consider implementing it yourself (we love PRs!)
-
-### 💻 **Code Contributions**
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b amazing-feature`
-3. **Implement** your changes with tests
-4. **Test** thoroughly: `cargo test --all-features`
-5. **Format** code: `cargo fmt && cargo clippy`
-6. **Submit** a pull request with detailed description
-
-### 📝 **Documentation**
-
-- Improve README, man page, or code documentation
-- Add usage examples or tutorials
-- Fix typos or clarify explanations
-- Translate documentation to other languages
-
-### 🎨 **Other Ways to Help**
-
-- ⭐ **Star the repository** to show your support
-- 🐦 **Share on social media** to help others discover Relfa
-- 💰 **[Sponsor the project](https://github.com/sponsors/nilp0inter)** to support development
-- 🗣️ **Provide feedback** on your user experience
-
-## 📊 Project Statistics
-
-<div align="center">
-
-![GitHub stars](https://img.shields.io/github/stars/nilp0inter/relfa?style=social)
-![GitHub forks](https://img.shields.io/github/forks/nilp0inter/relfa?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/nilp0inter/relfa?style=social)
-
-[![GitHub contributors](https://img.shields.io/github/contributors/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/graphs/contributors)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/pulse)
-[![GitHub last commit](https://img.shields.io/github/last-commit/nilp0inter/relfa)](https://github.com/nilp0inter/relfa/commits/main)
-
-</div>
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- 💡 **Inspiration**: The endless struggle against digital entropy and the need for gentle file management
-- 🦀 **Built with Rust**: Leveraging the amazing Rust ecosystem and community
-- 🏗️ **Architecture**: Inspired by the Unix philosophy of small, composable tools
-- 🌟 **Community**: Special thanks to all contributors, users, and feedback providers
-- 📚 **Influences**: Getting Things Done methodology and digital minimalism principles
-
-## 🔮 Roadmap
-
-<details>
-<summary>🛣️ Future Plans</summary>
-
-### 🎯 **Planned Features**
-
-- [ ] **Web interface** for remote graveyard management
-- [ ] **Plugin system** for custom archival rules
-- [ ] **Cloud backup** integration for graveyard sync
-- [ ] **AI-powered** file categorization and epitaph suggestions
-- [ ] **Statistics dashboard** showing digital entropy over time
-- [ ] **Integration** with popular file managers
-
-### 🎨 **Quality of Life**
-
-- [ ] **Fuzzy search** for file resurrection
-- [ ] **Bulk epitaph editing** for multiple files
-- [ ] **Themes** for CLI output customization
-- [ ] **Multiple inbox** support for different project types
-- [ ] **Advanced notifications** with custom triggers
-
-</details>
-
----
-
-<div align="center">
-
-**[⬆️ Back to Top](#-relfa---your-gentle-digital-gravedigger)**
-
----
-
-_"For dust thou art, and unto dust shalt thou return."_  
-_But maybe you'll want that markdown file again someday!_
-
-**Made with 🪦 and ❤️ by the Relfa community**
-
-_Happy haunting, and tidy archiving!_
-
-</div>
+This project is licensed under the MIT License. See the `LICENSE` file for details.
