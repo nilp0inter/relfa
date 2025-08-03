@@ -1,0 +1,146 @@
+name: Dependencies
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install cargo-edit
+      run: cargo install cargo-edit
+
+    - name: Update dependencies
+      run: |
+        cargo update
+        cargo upgrade --workspace
+
+    - name: Run tests
+      run: cargo test --all-features
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: 'chore: update dependencies'
+        body: |
+          This PR updates the project dependencies to their latest versions.
+          
+          ## Changes
+          - Updated Cargo.lock
+          - Updated dependency versions in Cargo.toml
+          
+          ## Testing
+          - [x] All tests pass
+          - [x] Build succeeds
+          
+          This PR was created automatically by the dependencies workflow.
+        branch: update-dependencies
+        delete-branch: true
+
+  security-updates:
+    name: Security Updates
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Check for security vulnerabilities
+      run: cargo audit
+
+    - name: Install cargo-fix
+      if: failure()
+      run: cargo install cargo-fix
+
+    - name: Attempt to fix security issues
+      if: failure()
+      run: cargo audit fix
+
+    - name: Create security update PR
+      if: failure()
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'security: fix vulnerabilities'
+        title: 'security: fix vulnerabilities'
+        body: |
+          This PR fixes security vulnerabilities found by cargo-audit.
+          
+          ## Security Issues
+          Run `cargo audit` for details.
+          
+          ## Changes
+          - Updated vulnerable dependencies
+          
+          **This is a security-critical update and should be reviewed and merged promptly.**
+        branch: security-updates
+        delete-branch: true
+        labels: security
+
+  check-outdated:
+    name: Check Outdated Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install cargo-outdated
+      run: cargo install cargo-outdated
+
+    - name: Check outdated dependencies
+      run: cargo outdated --exit-code 1
+
+    - name: Create issue for outdated dependencies
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { execSync } = require('child_process');
+          
+          try {
+            const outdated = execSync('cargo outdated', { encoding: 'utf8' });
+            
+            const issueBody = `## Outdated Dependencies Found
+            
+            The following dependencies are outdated:
+            
+            \`\`\`
+            ${outdated}
+            \`\`\`
+            
+            Consider updating these dependencies to their latest versions.
+            
+            This issue was created automatically by the dependencies workflow.`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Outdated dependencies detected',
+              body: issueBody,
+              labels: ['dependencies', 'maintenance']
+            });
+          } catch (error) {
+            console.log('No outdated dependencies or cargo outdated failed:', error.message);
+          }
