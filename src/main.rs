@@ -1,12 +1,12 @@
-use clap::Parser;
 use anyhow::Result;
+use clap::Parser;
 
-mod config;
-mod scanner;
 mod archiver;
 mod cli;
 mod commands;
+mod config;
 mod graveyard;
+mod scanner;
 mod utils;
 
 use cli::{Cli, Commands};

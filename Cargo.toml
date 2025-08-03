@@ -1,7 +1,7 @@
 [package]
 name = "relfa"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 description = "A gentle digital gravedigger to lovingly archive your old files."
 license = "MIT"
 repository = "https://github.com/nilp0inter/relfa"

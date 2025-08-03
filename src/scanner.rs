@@ -45,12 +45,10 @@ impl Scanner {
         let mut stale_items = Vec::new();
         let cutoff_date = Utc::now() - Duration::days(self.config.age_threshold_days as i64);
 
-        for entry in fs::read_dir(&self.config.inbox)
-            .context("Failed to read inbox directory")?
-        {
+        for entry in fs::read_dir(&self.config.inbox).context("Failed to read inbox directory")? {
             let entry = entry.context("Failed to read directory entry")?;
             let path = entry.path();
-            
+
             if let Some(last_modified) = self.get_last_modified_time(&path)? {
                 if last_modified < cutoff_date {
                     let age_days = (Utc::now() - last_modified).num_days();
@@ -76,9 +74,9 @@ impl Scanner {
 
     fn get_last_modified_time(&self, path: &Path) -> Result<Option<DateTime<Utc>>> {
         if path.is_file() {
-            let metadata = fs::metadata(path)
-                .context("Failed to get file metadata")?;
-            let modified = metadata.modified()
+            let metadata = fs::metadata(path).context("Failed to get file metadata")?;
+            let modified = metadata
+                .modified()
                 .context("Failed to get modification time")?;
             Ok(Some(DateTime::from(modified)))
         } else if path.is_dir() {
@@ -100,9 +98,9 @@ impl Scanner {
             }
 
             if latest_time.is_none() {
-                let metadata = fs::metadata(path)
-                    .context("Failed to get directory metadata")?;
-                let modified = metadata.modified()
+                let metadata = fs::metadata(path).context("Failed to get directory metadata")?;
+                let modified = metadata
+                    .modified()
                     .context("Failed to get modification time")?;
                 latest_time = Some(DateTime::from(modified));
             }
@@ -116,18 +114,25 @@ impl Scanner {
     pub fn display_scan_results(&self, stale_items: &[StaleItem]) {
         if stale_items.is_empty() {
             println!("✨ No dusty items found in your Inbox! All clean and tidy.");
-            self.send_notification("Relfa Scan Complete", "No dusty items found in your Inbox! All clean and tidy. ✨");
+            self.send_notification(
+                "Relfa Scan Complete",
+                "No dusty items found in your Inbox! All clean and tidy. ✨",
+            );
             return;
         }
 
-        let plural = if stale_items.len() == 1 { "item" } else { "items" };
+        let plural = if stale_items.len() == 1 {
+            "item"
+        } else {
+            "items"
+        };
         let message = format!(
             "☠️  {} {} in ~/Inbox {} gathering dust:",
             stale_items.len(),
             plural,
             if stale_items.len() == 1 { "is" } else { "are" }
         );
-        
+
         println!("{}", message);
 
         for item in stale_items {
@@ -161,7 +166,7 @@ impl Scanner {
                     eprintln!("Failed to send desktop notification: {}", e);
                 }
             }
-            
+
             #[cfg(target_os = "windows")]
             {
                 if let Err(e) = notify_rust::Notification::new()

@@ -1,12 +1,12 @@
 use anyhow::Result;
-use std::io::{self, Write};
 use chrono::{DateTime, Utc};
+use std::io::{self, Write};
 
-use crate::config::Config;
-use crate::scanner::{Scanner, StaleItem};
 use crate::archiver::Archiver;
+use crate::config::Config;
 use crate::graveyard::GraveyardManager;
-use crate::utils::{view_file_with_pager, open_file_with_default, delete_item};
+use crate::scanner::{Scanner, StaleItem};
+use crate::utils::{delete_item, open_file_with_default, view_file_with_pager};
 
 pub fn scan_inbox() -> Result<()> {
     let config = Config::load()?;
@@ -20,30 +20,30 @@ pub fn interactive_review() -> Result<()> {
     let config = Config::load()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config.clone());
-    
+
     let stale_items = scanner.scan_inbox()?;
-    
+
     if stale_items.is_empty() {
         println!("✨ No items to review - Inbox is clean!");
         return Ok(());
     }
-    
+
     println!("Found {} stale items for review:\n", stale_items.len());
-    
+
     let mut archived_count = 0;
     let mut skipped_count = 0;
-    
+
     for (i, item) in stale_items.iter().enumerate() {
         println!("[{}/{}] {}", i + 1, stale_items.len(), item.display());
-        
+
         loop {
             print!("Action: (a)rchive, (n)ote+archive, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit? ");
             io::stdout().flush()?;
-            
+
             let mut input = String::new();
             io::stdin().read_line(&mut input)?;
             let input = input.trim().to_lowercase();
-            
+
             match input.as_str() {
                 "a" | "archive" => {
                     archiver.archive_item_with_note(item, None)?;
@@ -53,11 +53,11 @@ pub fn interactive_review() -> Result<()> {
                 "n" | "note" => {
                     print!("📝 Enter epitaph note (why archive this?): ");
                     io::stdout().flush()?;
-                    
+
                     let mut note = String::new();
                     io::stdin().read_line(&mut note)?;
                     let note = note.trim();
-                    
+
                     if note.is_empty() {
                         archiver.archive_item_with_note(item, None)?;
                     } else {
@@ -67,14 +67,20 @@ pub fn interactive_review() -> Result<()> {
                     break;
                 }
                 "d" | "delete" => {
-                    println!("⚠️  WARNING: This will permanently delete '{}' and cannot be undone!", item.name);
-                    print!("🔒 To confirm, please type the exact name '{}': ", item.name);
+                    println!(
+                        "⚠️  WARNING: This will permanently delete '{}' and cannot be undone!",
+                        item.name
+                    );
+                    print!(
+                        "🔒 To confirm, please type the exact name '{}': ",
+                        item.name
+                    );
                     io::stdout().flush()?;
-                    
+
                     let mut confirmation = String::new();
                     io::stdin().read_line(&mut confirmation)?;
                     let confirmation = confirmation.trim();
-                    
+
                     if confirmation == item.name {
                         delete_item(&item.path)?;
                         println!("🗑️  Permanently deleted '{}'", item.name);
@@ -100,21 +106,29 @@ pub fn interactive_review() -> Result<()> {
                 }
                 "q" | "quit" => {
                     println!("\n🛑 Review cancelled.");
-                    println!("📊 Summary: {} processed, {} skipped", archived_count, skipped_count);
+                    println!(
+                        "📊 Summary: {} processed, {} skipped",
+                        archived_count, skipped_count
+                    );
                     return Ok(());
                 }
                 _ => {
-                    println!("Please enter 'a' for archive, 'n' for note+archive, 'd' for delete, 'v' for view, 'o' for open, 's' for skip, or 'q' to quit");
+                    println!(
+                        "Please enter 'a' for archive, 'n' for note+archive, 'd' for delete, 'v' for view, 'o' for open, 's' for skip, or 'q' to quit"
+                    );
                     continue;
                 }
             }
         }
-        
+
         println!(); // Empty line for readability
     }
-    
+
     println!("🎉 Review complete!");
-    println!("📊 Summary: {} processed, {} skipped", archived_count, skipped_count);
+    println!(
+        "📊 Summary: {} processed, {} skipped",
+        archived_count, skipped_count
+    );
     Ok(())
 }
 
@@ -122,20 +136,23 @@ pub fn archive_all_with_note(note: Option<&str>) -> Result<()> {
     let config = Config::load()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config);
-    
+
     let stale_items = scanner.scan_inbox()?;
-    
+
     if stale_items.is_empty() {
         println!("✨ No items to archive - Inbox is clean!");
         return Ok(());
     }
-    
+
     println!("Found {} stale items to archive:", stale_items.len());
     for item in &stale_items {
         archiver.archive_item_with_note(item, note)?;
     }
-    
-    println!("\n🎉 Successfully archived {} items to the Graveyard!", stale_items.len());
+
+    println!(
+        "\n🎉 Successfully archived {} items to the Graveyard!",
+        stale_items.len()
+    );
     Ok(())
 }
 
@@ -143,18 +160,18 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
     let config = Config::load()?;
     let scanner = Scanner::new(config.clone());
     let archiver = Archiver::new(config.clone());
-    
+
     // First, check if the file exists in the Inbox at all
     let inbox_path = config.inbox.join(item_name);
     if !inbox_path.exists() {
         println!("❌ Item '{}' not found in Inbox", item_name);
         return Ok(());
     }
-    
+
     // Check if it's among the stale items (for potential warning)
     let stale_items = scanner.scan_inbox()?;
     let is_stale = stale_items.iter().any(|i| i.name == item_name);
-    
+
     // Create a StaleItem for this file regardless of age
     let metadata = std::fs::metadata(&inbox_path)?;
     let last_modified = if let Ok(modified) = metadata.modified() {
@@ -162,7 +179,7 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
     } else {
         Utc::now()
     };
-    
+
     let age_days = (Utc::now() - last_modified).num_days();
     let item = StaleItem {
         path: inbox_path.clone(),
@@ -171,17 +188,19 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
         is_directory: inbox_path.is_dir(),
         age_days,
     };
-    
+
     // Show warning if file is not stale
     if !is_stale {
-        println!("⚠️  Warning: '{}' is only {} days old (threshold: {} days)", 
-                 item_name, age_days, config.age_threshold_days);
+        println!(
+            "⚠️  Warning: '{}' is only {} days old (threshold: {} days)",
+            item_name, age_days, config.age_threshold_days
+        );
         println!("📦 Archiving anyway as explicitly requested...");
     }
-    
+
     archiver.archive_item_with_note(&item, note)?;
     println!("🎉 Successfully archived '{}'!", item_name);
-    
+
     Ok(())
 }
 
@@ -200,7 +219,8 @@ pub fn search_graveyard(pattern: &str) -> Result<()> {
 pub fn show_config() -> Result<()> {
     let config = Config::load()?;
     println!("{}", config.display());
-    println!("\nConfig file location: {}", 
+    println!(
+        "\nConfig file location: {}",
         dirs::config_dir()
             .map(|d| d.join("relfa").join("config.toml").display().to_string())
             .unwrap_or_else(|| ".relfa.toml".to_string())
