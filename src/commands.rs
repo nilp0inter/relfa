@@ -106,9 +106,7 @@ pub fn interactive_review() -> Result<()> {
                 }
                 "q" | "quit" => {
                     println!("\n🛑 Review cancelled.");
-                    println!(
-                        "📊 Summary: {archived_count} processed, {skipped_count} skipped"
-                    );
+                    println!("📊 Summary: {archived_count} processed, {skipped_count} skipped");
                     return Ok(());
                 }
                 _ => {
@@ -124,9 +122,7 @@ pub fn interactive_review() -> Result<()> {
     }
 
     println!("🎉 Review complete!");
-    println!(
-        "📊 Summary: {archived_count} processed, {skipped_count} skipped"
-    );
+    println!("📊 Summary: {archived_count} processed, {skipped_count} skipped");
     Ok(())
 }
 
