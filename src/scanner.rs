@@ -116,32 +116,35 @@ impl Scanner {
                 .context("Failed to get modification time")?;
             Ok(Some(DateTime::from(modified)))
         } else if path.is_dir() {
-            let mut latest_time: Option<DateTime<Utc>> = None;
+            // Start with the directory's own modification time
+            let metadata = fs::metadata(path).context("Failed to get directory metadata")?;
+            let dir_modified = metadata
+                .modified()
+                .context("Failed to get modification time")?;
+            let mut latest_time = DateTime::from(dir_modified);
 
+            // Then check all files and subdirectories recursively
             for entry in WalkDir::new(path)
                 .into_iter()
                 .filter_map(|e| e.ok())
-                .filter(|e| e.file_type().is_file())
+                .filter(|e| e.file_type().is_file() || e.file_type().is_dir())
             {
+                // Skip the root directory itself to avoid double-counting
+                if entry.path() == path {
+                    continue;
+                }
+
                 if let Ok(metadata) = entry.metadata() {
                     if let Ok(modified) = metadata.modified() {
                         let modified_dt = DateTime::from(modified);
-                        if latest_time.is_none() || Some(modified_dt) > latest_time {
-                            latest_time = Some(modified_dt);
+                        if modified_dt > latest_time {
+                            latest_time = modified_dt;
                         }
                     }
                 }
             }
 
-            if latest_time.is_none() {
-                let metadata = fs::metadata(path).context("Failed to get directory metadata")?;
-                let modified = metadata
-                    .modified()
-                    .context("Failed to get modification time")?;
-                latest_time = Some(DateTime::from(modified));
-            }
-
-            Ok(latest_time)
+            Ok(Some(latest_time))
         } else {
             Ok(None)
         }
