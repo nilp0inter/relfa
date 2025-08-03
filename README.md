@@ -15,7 +15,7 @@
 
 [📦 Installation](#-installation) • [🚀 Quick Start](#-quick-start) • [✨ Features](#-features) • [📚 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
 
-*"In Relfa's Graveyard, nothing is truly lost—just waiting in gentle slumber for you, or the next digital archaeologist."*
+_"In Relfa's Graveyard, nothing is truly lost—just waiting in gentle slumber for you, or the next digital archaeologist."_
 
 </div>
 
@@ -28,7 +28,7 @@ Relfa is your **gentle digital gravedigger** that helps you maintain a clean wor
 ### 🎯 Philosophy
 
 - **🕊️ Gentle Approach**: No aggressive deletions, just loving archival
-- **🔍 Smart Detection**: Identifies files that haven't been touched recently  
+- **🔍 Smart Detection**: Identifies files that haven't been touched recently
 - **🗃️ Organized Storage**: Creates a structured graveyard with multiple time-based views
 - **🧟‍♂️ Easy Resurrection**: Bring back archived files when you need them
 - **📝 Memory Keeping**: Add epitaphs explaining why files were archived
@@ -41,12 +41,14 @@ Relfa is your **gentle digital gravedigger** that helps you maintain a clean wor
 <td width="50%">
 
 ### 🎮 **Interactive Review**
+
 - Multi-action interface: archive, delete, view, open, skip
 - Safety confirmations for destructive actions
 - Real-time file preview with configurable pager
 - Desktop application integration
 
 ### 🗃️ **Flexible Archival System**
+
 - Smart organization by creation/modification/archival dates
 - Efficient symlink-based storage
 - Configurable graveyard structure
@@ -56,12 +58,14 @@ Relfa is your **gentle digital gravedigger** that helps you maintain a clean wor
 <td width="50%">
 
 ### 🔍 **Powerful Search**
+
 - Filename pattern matching
 - Content search within epitaph notes
 - Visual indicators for match sources
 - Smart deduplication
 
 ### 📱 **Modern UX**
+
 - Desktop notifications
 - Configurable pager support
 - Rich emoji-enhanced CLI output
@@ -131,7 +135,7 @@ man relfa  # View the manual
 # View current configuration
 relfa config
 
-# Scan your inbox for stale files  
+# Scan your inbox for stale files
 relfa scan
 ```
 
@@ -163,15 +167,15 @@ relfa review
 
 The interactive review gives you options for each file:
 
-| Command | Action | Description |
-|---------|--------|-------------|
-| **`(a)rchive`** | 🗃️ Archive | Move to graveyard without note |
-| **`(n)ote+archive`** | 📝 Archive with epitaph | Add explanatory note |
-| **`(d)elete`** | 🗑️ Delete | Permanent deletion (requires confirmation) |
-| **`(v)iew`** | 👀 View | Preview content with pager |
-| **`(o)pen`** | 🚀 Open | Open with default application |
-| **`(s)kip`** | ⏭️ Skip | Skip for now |
-| **`(q)uit`** | 🚪 Quit | Exit review session |
+| Command              | Action                  | Description                                |
+| -------------------- | ----------------------- | ------------------------------------------ |
+| **`(a)rchive`**      | 🗃️ Archive              | Move to graveyard without note             |
+| **`(n)ote+archive`** | 📝 Archive with epitaph | Add explanatory note                       |
+| **`(d)elete`**       | 🗑️ Delete               | Permanent deletion (requires confirmation) |
+| **`(v)iew`**         | 👀 View                 | Preview content with pager                 |
+| **`(o)pen`**         | 🚀 Open                 | Open with default application              |
+| **`(s)kip`**         | ⏭️ Skip                 | Skip for now                               |
+| **`(q)uit`**         | 🚪 Quit                 | Exit review session                        |
 
 ### 3. 📦 **Batch Operations**
 
@@ -235,7 +239,7 @@ relfa resurrect "important-file"
 Found 2 matches in the Graveyard:
   📄 created/laptop/2024/07/15/project-alpha-notes.md
      💭 "Meeting notes from project alpha kickoff"
-  📄 created/laptop/2024/06/20/project-proposal.pdf  
+  📄 created/laptop/2024/06/20/project-proposal.pdf
      💭 "Initial proposal document - archived after approval" 🔍
 ```
 
@@ -261,8 +265,9 @@ Relfa creates an elegantly organized graveyard structure:
 ```
 
 This structure provides:
+
 - 📅 **Browse by creation date**: Find files by when they were originally created
-- ✏️ **Browse by modification date**: See files by when they were last changed  
+- ✏️ **Browse by modification date**: See files by when they were last changed
 - 🗃️ **Browse by archival date**: Review recently archived items
 - 💾 **Efficient storage**: Symlinks prevent duplication while providing multiple views
 - 🔍 **Consistent organization**: Epitaphs follow the same symlink structure as files
@@ -288,14 +293,14 @@ date_format = "{hostname}/{year}/{month:02}/{day:02}"
 type = "original"    # Contains actual files
 name = "created"
 
-[path_format.modified_subdir]  
+[path_format.modified_subdir]
 type = "symlink"     # Contains symlinks
 name = "modified"
 target = "created"   # Points to created subdir
 
 [path_format.archived_subdir]
 type = "symlink"
-name = "archived" 
+name = "archived"
 target = "modified"  # Creates chain: archived → modified → created
 ```
 
@@ -307,7 +312,7 @@ target = "modified"  # Creates chain: archived → modified → created
 Each subdirectory can be configured as:
 
 - **`original`** - Contains the actual files
-- **`symlink`** - Contains symlinks pointing to another subdirectory  
+- **`symlink`** - Contains symlinks pointing to another subdirectory
 - **`nothing`** - Disabled (not created)
 
 Example configurations:
@@ -321,7 +326,7 @@ name = "by-creation"
 [path_format.modified_subdir]
 type = "nothing"
 
-[path_format.archived_subdir] 
+[path_format.archived_subdir]
 type = "nothing"
 ```
 
@@ -332,7 +337,7 @@ type = "original"
 name = "created"
 
 [path_format.modified_subdir]
-type = "symlink"  
+type = "symlink"
 name = "modified"
 target = "created"
 
@@ -351,15 +356,16 @@ The `date_format` supports these placeholders:
 
 - `{hostname}` - Computer hostname
 - `{year}` - Full year (2024)
-- `{month}` - Month number (8) 
+- `{month}` - Month number (8)
 - `{month:02}` - Zero-padded month (08)
 - `{day}` - Day number (15)
 - `{day:02}` - Zero-padded day (15)
 
 Examples:
+
 ```toml
 date_format = "{year}/{month:02}/{day:02}"                    # 2024/08/15
-date_format = "{hostname}/{year}-{month:02}"                  # laptop/2024-08  
+date_format = "{hostname}/{year}-{month:02}"                  # laptop/2024-08
 date_format = "archive-{year}-{month:02}-{day:02}"           # archive-2024-08-15
 ```
 
@@ -372,6 +378,7 @@ Relfa provides a comprehensive Nix flake with packages and Home Manager modules 
 ### 📦 **Package Installation**
 
 #### Direct Usage
+
 ```bash
 # Run relfa directly from the flake
 nix run github:nilp0inter/relfa
@@ -384,10 +391,11 @@ nix shell github:nilp0inter/relfa
 ```
 
 #### In a Nix System Configuration
+
 ```nix
 {
   inputs.relfa.url = "github:nilp0inter/relfa";
-  
+
   # In your system configuration
   environment.systemPackages = [ inputs.relfa.packages.${system}.relfa ];
 }
@@ -396,13 +404,14 @@ nix shell github:nilp0inter/relfa
 ### 🏠 **Home Manager Integration**
 
 #### Basic Configuration
+
 ```nix
 {
   inputs.relfa.url = "github:nilp0inter/relfa";
-  
+
   # In your home.nix:
   imports = [ inputs.relfa.homeManagerModules.relfa ];
-  
+
   programs.relfa = {
     enable = true;
     settings = {
@@ -419,10 +428,11 @@ nix shell github:nilp0inter/relfa
 ### ⏰ **Automated Execution with Systemd Timer**
 
 #### Hourly Scan and Auto-Archive (Recommended)
+
 ```nix
 programs.relfa = {
   enable = true;
-  
+
   # Configure desktop notifications and settings
   settings = {
     notification = "desktop";
@@ -431,7 +441,7 @@ programs.relfa = {
     inbox = "${config.home.homeDirectory}/Inbox";
     graveyard = "${config.home.homeDirectory}/Graveyard";
   };
-  
+
   # Systemd timer configuration
   timer = {
     enable = true;
@@ -443,11 +453,12 @@ programs.relfa = {
 ```
 
 #### Daily Scan Only (Non-Destructive)
+
 ```nix
 programs.relfa = {
   enable = true;
   settings.notification = "desktop";
-  
+
   timer = {
     enable = true;
     frequency = "daily";
@@ -458,19 +469,20 @@ programs.relfa = {
 ```
 
 #### Custom Schedule Examples
+
 ```nix
 timer = {
   enable = true;
-  
+
   # Every 30 minutes
   frequency = "*:0/30";
-  
+
   # Every 6 hours
   frequency = "0/6:00:00";
-  
+
   # Weekdays at 9 AM
   frequency = "Mon..Fri 09:00:00";
-  
+
   # Daily at 2 PM with 2-hour random delay
   frequency = "daily";
   randomizedDelay = "2h";
@@ -485,10 +497,10 @@ timer = {
 ```nix
 programs.relfa = {
   enable = true;
-  
+
   # Package override (optional)
   package = inputs.relfa.packages.${pkgs.system}.relfa;
-  
+
   # Core settings
   settings = {
     inbox = "${config.home.homeDirectory}/Inbox";
@@ -498,7 +510,7 @@ programs.relfa = {
     notification = "desktop";            # "cli" or "desktop"
     pager = "bat";                      # File viewer command
   };
-  
+
   # Systemd timer (optional)
   timer = {
     enable = true;
@@ -514,6 +526,7 @@ programs.relfa = {
 ### 🔔 **Notification Examples**
 
 #### What You'll See with Timer Enabled:
+
 - **Scan results**: `🔍 Scan Complete: 2 files gathering dust in Inbox`
 - **Auto-archive warnings**: `🤖 Auto-archived 1 file to Graveyard (old-document.pdf)`
 - **Clean state**: `✨ No files need attention - Inbox is clean!`
@@ -521,21 +534,25 @@ programs.relfa = {
 ### 🚀 **Getting Started with Nix**
 
 1. **Add relfa to your flake inputs:**
+
    ```nix
    inputs.relfa.url = "github:nilp0inter/relfa";
    ```
 
 2. **Import the Home Manager module:**
+
    ```nix
    imports = [ inputs.relfa.homeManagerModules.relfa ];
    ```
 
 3. **Enable with basic configuration:**
+
    ```nix
    programs.relfa.enable = true;
    ```
 
 4. **Rebuild your system:**
+
    ```bash
    home-manager switch  # For home-manager
    # or
@@ -560,7 +577,7 @@ Epitaphs are optional notes that explain why files were archived, creating a his
 # During archival
 relfa archive old-logs/ --note "Log files from completed project - kept for reference"
 
-# During interactive review  
+# During interactive review
 relfa review
 # Choose (n)ote+archive and enter your explanation
 
@@ -575,7 +592,7 @@ Epitaphs are stored as `.epitaph` files containing structured metadata and your 
 ```
 # Epitaph for project-notes.md
 # Archived: 2024-08-02 15:30:45 UTC
-# Created: 2024-01-15 09:22:10 UTC  
+# Created: 2024-01-15 09:22:10 UTC
 # Modified: 2024-07-28 16:45:33 UTC
 # Hostname: workstation
 
@@ -591,7 +608,7 @@ Epitaph content is fully searchable:
 ```bash
 # Find files by epitaph content
 relfa search "meeting notes"
-relfa search "Q1 2024"  
+relfa search "Q1 2024"
 relfa search "retrospective"
 
 # Case-insensitive search
@@ -629,7 +646,7 @@ relfa search "presentation"
 relfa search "*.pdf"
 relfa search "2024"
 
-# Search by epitaph content  
+# Search by epitaph content
 relfa search "project alpha"
 relfa search "meeting notes"
 relfa search "semester"
@@ -648,7 +665,7 @@ relfa resurrect "important-document"
 relfa resurrect "presentation"
 # Found 3 matches:
 #   1. presentation-draft.pptx
-#   2. final-presentation.pptx  
+#   2. final-presentation.pptx
 #   3. presentation-notes.md
 # Which file to resurrect? (1-3, or 'q' to quit): 2
 
@@ -688,7 +705,7 @@ echo "✨ Weekly cleanup complete!"
 <summary>📅 Project Archive Script</summary>
 
 ```bash
-#!/bin/bash  
+#!/bin/bash
 # project-archive.sh PROJECT_NAME
 
 PROJECT_NAME=${1:-"unnamed-project"}
@@ -714,12 +731,14 @@ echo "✅ Project archival complete for: $PROJECT_NAME"
 <td width="50%">
 
 ### 👩‍💼 **Professionals**
+
 - **Downloads cleanup**: Archive old downloads with context
 - **Project management**: Organize completed projects by timeline
 - **Document versioning**: Archive old versions with change notes
 - **Meeting materials**: Archive with meeting context and outcomes
 
-### 🎓 **Students**  
+### 🎓 **Students**
+
 - **Assignment organization**: Archive by semester with grades/feedback
 - **Research materials**: Keep old research accessible with context
 - **Course notes**: Archive by semester with course information
@@ -729,12 +748,14 @@ echo "✅ Project archival complete for: $PROJECT_NAME"
 <td width="50%">
 
 ### 💻 **Developers**
-- **Log management**: Archive logs with deployment context  
+
+- **Log management**: Archive logs with deployment context
 - **Build artifacts**: Archive with version and build information
 - **Backup organization**: Structure backups with project context
 - **Code samples**: Archive experimental code with learning notes
 
 ### 🏠 **Home Users**
+
 - **Photo organization**: Archive old photos with family context
 - **Document management**: Keep important docs with life events
 - **Media collection**: Archive old media with descriptive context
@@ -782,7 +803,7 @@ RELFA_CONFIG_DIR=./test-config ./target/debug/relfa scan
 ```
 src/
 ├── main.rs           # CLI entry point and command routing
-├── cli.rs            # Command-line argument parsing  
+├── cli.rs            # Command-line argument parsing
 ├── commands.rs       # Business logic for all commands
 ├── config.rs         # Configuration management
 ├── scanner.rs        # File scanning and age detection
@@ -838,7 +859,7 @@ We welcome contributions! Here's how you can help make Relfa even better:
 ### 📝 **Documentation**
 
 - Improve README, man page, or code documentation
-- Add usage examples or tutorials  
+- Add usage examples or tutorials
 - Fix typos or clarify explanations
 - Translate documentation to other languages
 
@@ -881,6 +902,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 <summary>🛣️ Future Plans</summary>
 
 ### 🎯 **Planned Features**
+
 - [ ] **Web interface** for remote graveyard management
 - [ ] **Plugin system** for custom archival rules
 - [ ] **Cloud backup** integration for graveyard sync
@@ -889,6 +911,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - [ ] **Integration** with popular file managers
 
 ### 🎨 **Quality of Life**
+
 - [ ] **Fuzzy search** for file resurrection
 - [ ] **Bulk epitaph editing** for multiple files
 - [ ] **Themes** for CLI output customization
@@ -905,11 +928,11 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-*"For dust thou art, and unto dust shalt thou return."*  
-*But maybe you'll want that markdown file again someday!*
+_"For dust thou art, and unto dust shalt thou return."_  
+_But maybe you'll want that markdown file again someday!_
 
 **Made with 🪦 and ❤️ by the Relfa community**
 
-*Happy haunting, and tidy archiving!*
+_Happy haunting, and tidy archiving!_
 
 </div>
