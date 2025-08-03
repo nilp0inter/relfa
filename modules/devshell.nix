@@ -52,6 +52,10 @@
             value = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
           }
         ];
+
+        devshell.startup.pre-commit-install = {
+          text = config.pre-commit.installationScript;
+        };
       };
     };
 }
