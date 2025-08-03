@@ -19,7 +19,7 @@ impl GraveyardManager {
         let matches = self.find_in_graveyard(pattern)?;
 
         if matches.is_empty() {
-            println!("💀 No files found matching '{}' in the Graveyard", pattern);
+            println!("💀 No files found matching '{pattern}' in the Graveyard");
             return Ok(());
         }
 
@@ -38,7 +38,7 @@ impl GraveyardManager {
             let dest = self.config.inbox.join(filename);
 
             copy_file_or_dir(source, &dest)?;
-            println!("🧟‍♂️ Resurrected '{}' to Inbox!", filename);
+            println!("🧟‍♂️ Resurrected '{filename}' to Inbox!");
         } else {
             // Interactive selection for multiple matches
             print!(
@@ -66,7 +66,7 @@ impl GraveyardManager {
                     let dest = self.config.inbox.join(filename);
 
                     copy_file_or_dir(source, &dest)?;
-                    println!("🧟‍♂️ Resurrected '{}' to Inbox!", filename);
+                    println!("🧟‍♂️ Resurrected '{filename}' to Inbox!");
                 } else {
                     println!("Invalid choice.");
                 }
@@ -82,7 +82,7 @@ impl GraveyardManager {
         let matches = self.find_in_graveyard(pattern)?;
 
         if matches.is_empty() {
-            println!("💀 No files found matching '{}' in the Graveyard", pattern);
+            println!("💀 No files found matching '{pattern}' in the Graveyard");
             return Ok(());
         }
 
@@ -123,9 +123,9 @@ impl GraveyardManager {
                                     .to_lowercase()
                                     .contains(&pattern.to_lowercase())
                             {
-                                println!("     💭 \"{}\" 🔍", note);
+                                println!("     💭 \"{note}\" 🔍");
                             } else {
-                                println!("     💭 \"{}\"", note);
+                                println!("     💭 \"{note}\"");
                             }
                         }
                     }

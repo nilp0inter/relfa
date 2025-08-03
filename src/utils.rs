@@ -45,7 +45,7 @@ pub fn open_file_with_default(file_path: &Path) -> Result<()> {
     let status = std::process::Command::new(command)
         .arg(file_path)
         .status()
-        .context(format!("Failed to execute {}", command))?;
+        .context(format!("Failed to execute {command}"))?;
 
     if status.success() {
         println!(

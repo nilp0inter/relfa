@@ -58,9 +58,9 @@ impl Archiver {
             } else {
                 // Copy to additional locations
                 if item.path.is_dir() {
-                    self.copy_dir_all(&primary_path.as_ref().unwrap(), &target_path)?;
+                    copy_dir_all(primary_path.as_ref().unwrap(), &target_path)?;
                 } else {
-                    fs::copy(&primary_path.as_ref().unwrap(), &target_path)
+                    fs::copy(primary_path.as_ref().unwrap(), &target_path)
                         .context("Failed to copy item to additional location")?;
                 }
             }
@@ -190,20 +190,6 @@ impl Archiver {
             .join(name)
     }
 
-    fn copy_dir_all(&self, src: &Path, dst: &Path) -> Result<()> {
-        fs::create_dir_all(dst)?;
-        for entry in fs::read_dir(src)? {
-            let entry = entry?;
-            let ty = entry.file_type()?;
-            if ty.is_dir() {
-                self.copy_dir_all(&entry.path(), &dst.join(entry.file_name()))?;
-            } else {
-                fs::copy(entry.path(), dst.join(entry.file_name()))?;
-            }
-        }
-        Ok(())
-    }
-
     fn create_remaining_symlinks(
         &self,
         name: &str,
@@ -290,7 +276,7 @@ impl Archiver {
                     &original_name[dot_pos..]
                 )
             } else {
-                format!("{}_{}", original_name, counter)
+                format!("{original_name}_{counter}")
             };
 
             path.set_file_name(new_name);
@@ -331,7 +317,7 @@ impl Archiver {
             note
         );
 
-        let epitaph_filename = format!("{}.epitaph", name);
+        let epitaph_filename = format!("{name}.epitaph");
         let mut primary_epitaph_path = None;
         let mut created_epitaph_paths = std::collections::HashMap::new();
 
@@ -438,4 +424,18 @@ impl Archiver {
 
         Ok(())
     }
+}
+
+fn copy_dir_all(src: &Path, dst: &Path) -> Result<()> {
+    fs::create_dir_all(dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(&entry.path(), &dst.join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.join(entry.file_name()))?;
+        }
+    }
+    Ok(())
 }

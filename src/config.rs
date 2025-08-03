@@ -82,8 +82,8 @@ impl Default for PathFormatConfig {
 impl SubdirConfig {
     pub fn display(&self) -> String {
         match self {
-            SubdirConfig::Original { name } => format!("{} (original)", name),
-            SubdirConfig::Symlink { name, target } => format!("{} (symlink -> {})", name, target),
+            SubdirConfig::Original { name } => format!("{name} (original)"),
+            SubdirConfig::Symlink { name, target } => format!("{name} (symlink -> {target})"),
             SubdirConfig::Nothing => "disabled".to_string(),
         }
     }

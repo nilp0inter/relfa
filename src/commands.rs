@@ -107,8 +107,7 @@ pub fn interactive_review() -> Result<()> {
                 "q" | "quit" => {
                     println!("\n🛑 Review cancelled.");
                     println!(
-                        "📊 Summary: {} processed, {} skipped",
-                        archived_count, skipped_count
+                        "📊 Summary: {archived_count} processed, {skipped_count} skipped"
                     );
                     return Ok(());
                 }
@@ -126,8 +125,7 @@ pub fn interactive_review() -> Result<()> {
 
     println!("🎉 Review complete!");
     println!(
-        "📊 Summary: {} processed, {} skipped",
-        archived_count, skipped_count
+        "📊 Summary: {archived_count} processed, {skipped_count} skipped"
     );
     Ok(())
 }
@@ -164,7 +162,7 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
     // First, check if the file exists in the Inbox at all
     let inbox_path = config.inbox.join(item_name);
     if !inbox_path.exists() {
-        println!("❌ Item '{}' not found in Inbox", item_name);
+        println!("❌ Item '{item_name}' not found in Inbox");
         return Ok(());
     }
 
@@ -199,7 +197,7 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
     }
 
     archiver.archive_item_with_note(&item, note)?;
-    println!("🎉 Successfully archived '{}'!", item_name);
+    println!("🎉 Successfully archived '{item_name}'!");
 
     Ok(())
 }

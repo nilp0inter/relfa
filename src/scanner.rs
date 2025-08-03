@@ -133,7 +133,7 @@ impl Scanner {
             if stale_items.len() == 1 { "is" } else { "are" }
         );
 
-        println!("{}", message);
+        println!("{message}");
 
         for item in stale_items {
             println!("   {}", item.display());
@@ -163,7 +163,7 @@ impl Scanner {
                     .timeout(notify_rust::Timeout::Milliseconds(5000))
                     .show()
                 {
-                    eprintln!("Failed to send desktop notification: {}", e);
+                    eprintln!("Failed to send desktop notification: {e}");
                 }
             }
 

@@ -28,18 +28,18 @@ fn main() -> Result<()> {
                 println!("🪦 Archiving all eligible files...");
                 commands::archive_all_with_note(note.as_deref())?;
             } else if let Some(item) = item {
-                println!("🪦 Archiving {}...", item);
+                println!("🪦 Archiving {item}...");
                 commands::archive_item_with_note(&item, note.as_deref())?;
             } else {
                 println!("Please specify either --all or an item to archive");
             }
         }
         Commands::Resurrect { pattern } => {
-            println!("🧟 Searching for '{}' in the Graveyard...", pattern);
+            println!("🧟 Searching for '{pattern}' in the Graveyard...");
             commands::resurrect_files(&pattern)?;
         }
         Commands::Search { pattern } => {
-            println!("🔍 Searching for '{}' in the Graveyard...", pattern);
+            println!("🔍 Searching for '{pattern}' in the Graveyard...");
             commands::search_graveyard(&pattern)?;
         }
         Commands::Config => {
