@@ -1,0 +1,202 @@
+.TH RELFA 1 "August 2025" "relfa 0.1.0" "User Commands"
+.SH NAME
+relfa \- Your gentle digital gravedigger
+.SH SYNOPSIS
+.B relfa
+[\fICOMMAND\fR] [\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B relfa
+helps you keep your computer's clutter under control by monitoring your Inbox folder, nudging you to review old files, and lovingly archiving them in a dust-covered, cobwebby digital Graveyard.
+
+Relfa provides a flexible archival system with configurable subdirectories that can contain original files or symlinks, allowing you to organize files by creation, modification, and archival dates while maintaining multiple views of the same data.
+
+.SH COMMANDS
+.TP
+.B scan
+Scan the Inbox for stale files that exceed the configured age threshold. Shows a summary of dusty items that need attention.
+.TP
+.B review
+Start an interactive review session to process stale files one by one. For each file, you can:
+.RS
+.IP \(bu 2
+.B (a)rchive - Archive without a note
+.IP \(bu 2
+.B (n)ote+archive - Archive with an epitaph explaining why
+.IP \(bu 2
+.B (d)elete - Permanently delete (requires typing exact filename)
+.IP \(bu 2
+.B (v)iew - Show file content using configured pager
+.IP \(bu 2
+.B (o)pen - Open with default application
+.IP \(bu 2
+.B (s)kip - Skip this file for now
+.IP \(bu 2
+.B (q)uit - Exit review session
+.RE
+.TP
+.B archive \fR[\fIITEM\fR] [\fIOPTIONS\fR]
+Archive files to the Graveyard.
+.RS
+.TP
+.BI \-\-all
+Archive all eligible files at once.
+.TP
+.BI \-\-note " NOTE"
+Add an epitaph (note) explaining why the file was archived.
+.RE
+.TP
+.B resurrect \fIPATTERN\fR
+Search for files in the Graveyard matching PATTERN and copy them back to the Inbox. Files remain in the Graveyard (resurrection does not remove them).
+.TP
+.B search \fIPATTERN\fR
+Search for files in the Graveyard matching PATTERN. Shows file paths and any associated epitaphs.
+.TP
+.B config
+Display current configuration settings and config file location.
+
+.SH CONFIGURATION
+Configuration is stored in a TOML file at \fB~/.config/relfa/config.toml\fR (or \fB.relfa.toml\fR as fallback).
+
+.SS Basic Settings
+.TP
+.B inbox
+Path to the directory to monitor for stale files (default: ~/Inbox).
+.TP
+.B graveyard  
+Path to the directory where archived files are stored (default: ~/Graveyard).
+.TP
+.B age_threshold_days
+Number of days after which files are considered stale (default: 14).
+.TP
+.B notification
+Notification type: "cli" or "desktop" (default: "cli").
+.TP
+.B pager
+Command to use for viewing files (default: "less", respects $PAGER environment variable).
+
+.SS Path Format Configuration
+The \fBpath_format\fR section controls how archived files are organized:
+
+.TP
+.B date_format
+Template for date-based paths. Supports: {hostname}, {year}, {month}, {day}, {month:02}, {day:02}
+.br
+Default: "{hostname}/{year}/{month:02}/{day:02}"
+
+.TP
+.B created_subdir, modified_subdir, archived_subdir
+Each subdirectory can be configured as:
+.RS
+.IP \(bu 2
+.B original - Contains the actual file
+.IP \(bu 2  
+.B symlink - Contains a symlink pointing to another subdirectory
+.IP \(bu 2
+.B nothing - Disabled (not created)
+.RE
+
+.SS Example Configuration
+.nf
+inbox = "/home/user/Inbox"
+graveyard = "/home/user/Graveyard"  
+age_threshold_days = 30
+notification = "desktop"
+pager = "less"
+
+[path_format]
+date_format = "{hostname}/{year}/{month:02}/{day:02}"
+
+[path_format.created_subdir]
+type = "original"
+name = "created"
+
+[path_format.modified_subdir]  
+type = "symlink"
+name = "modified"
+target = "created"
+
+[path_format.archived_subdir]
+type = "symlink" 
+name = "archived"
+target = "modified"
+.fi
+
+.SH GRAVEYARD STRUCTURE
+Files are organized in the Graveyard using a hierarchical structure:
+
+.nf
+Graveyard/
+├── created/hostname/2025/08/02/file.txt (original)
+├── modified/hostname/2024/02/28/file.txt -> ../../../created/...
+└── archived/hostname/2025/08/02/file.txt -> ../../../modified/...
+.fi
+
+This allows you to view files organized by when they were created, last modified, or archived, while maintaining storage efficiency through symlinks.
+
+.SH EPITAPHS
+When archiving files with the \fB\-\-note\fR option or during interactive review, Relfa creates epitaph files containing:
+.IP \(bu 2
+Metadata (archived/created/modified timestamps, hostname)
+.IP \(bu 2
+Your explanation of why the file was archived
+
+Epitaphs follow the same symlink structure as the files themselves and are displayed during search operations.
+
+.SH EXAMPLES
+.TP
+Scan for stale files:
+.B relfa scan
+
+.TP  
+Start interactive review:
+.B relfa review
+
+.TP
+Archive all stale files with a note:
+.B relfa archive \-\-all \-\-note "Cleaning up old project files"
+
+.TP
+Archive a specific file:
+.B relfa archive old\-document.pdf \-\-note "Outdated specification"
+
+.TP
+Search for files:
+.B relfa search "project"
+
+.TP
+Resurrect files back to Inbox:
+.B relfa resurrect "important"
+
+.TP
+View current configuration:
+.B relfa config
+
+.SH FILES
+.TP
+.B ~/.config/relfa/config.toml
+Main configuration file (created automatically on first run).
+.TP  
+.B ~/Inbox
+Default directory monitored for stale files.
+.TP
+.B ~/Graveyard  
+Default directory where archived files are stored.
+
+.SH ENVIRONMENT
+.TP
+.B PAGER
+Used as the default pager if not specified in configuration.
+
+.SH EXIT STATUS
+.B relfa
+exits with status 0 on success, and >0 if an error occurs.
+
+.SH AUTHOR
+Generated with Claude Code (https://claude.ai/code)
+
+.SH SEE ALSO
+.BR find (1),
+.BR rm (1),
+.BR ln (1),
+.BR less (1),
+.BR xdg-open (1)
