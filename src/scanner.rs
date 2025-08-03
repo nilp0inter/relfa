@@ -72,6 +72,42 @@ impl Scanner {
         Ok(stale_items)
     }
 
+    pub fn scan_auto_archive_eligible(&self) -> Result<Vec<StaleItem>> {
+        if !self.config.inbox.exists() {
+            return Ok(vec![]);
+        }
+
+        let mut auto_archive_items = Vec::new();
+        let cutoff_date =
+            Utc::now() - Duration::days(self.config.auto_archive_threshold_days as i64);
+
+        for entry in fs::read_dir(&self.config.inbox).context("Failed to read inbox directory")? {
+            let entry = entry.context("Failed to read directory entry")?;
+            let path = entry.path();
+
+            if let Some(last_modified) = self.get_last_modified_time(&path)? {
+                if last_modified < cutoff_date {
+                    let age_days = (Utc::now() - last_modified).num_days();
+                    let name = path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+
+                    auto_archive_items.push(StaleItem {
+                        path: path.clone(),
+                        name,
+                        last_modified,
+                        is_directory: path.is_dir(),
+                        age_days,
+                    });
+                }
+            }
+        }
+
+        Ok(auto_archive_items)
+    }
+
     fn get_last_modified_time(&self, path: &Path) -> Result<Option<DateTime<Utc>>> {
         if path.is_file() {
             let metadata = fs::metadata(path).context("Failed to get file metadata")?;
@@ -112,7 +148,10 @@ impl Scanner {
     }
 
     pub fn display_scan_results(&self, stale_items: &[StaleItem]) {
-        if stale_items.is_empty() {
+        // Also check for auto-archive eligible items
+        let auto_archive_items = self.scan_auto_archive_eligible().unwrap_or_default();
+
+        if stale_items.is_empty() && auto_archive_items.is_empty() {
             println!("✨ No dusty items found in your Inbox! All clean and tidy.");
             self.send_notification(
                 "Relfa Scan Complete",
@@ -121,34 +160,87 @@ impl Scanner {
             return;
         }
 
-        let plural = if stale_items.len() == 1 {
-            "item"
-        } else {
-            "items"
-        };
-        let message = format!(
-            "☠️  {} {} in ~/Inbox {} gathering dust:",
-            stale_items.len(),
-            plural,
-            if stale_items.len() == 1 { "is" } else { "are" }
-        );
+        // Display stale items (regular threshold)
+        if !stale_items.is_empty() {
+            let plural = if stale_items.len() == 1 {
+                "item"
+            } else {
+                "items"
+            };
+            let message = format!(
+                "☠️  {} {} in ~/Inbox {} gathering dust:",
+                stale_items.len(),
+                plural,
+                if stale_items.len() == 1 { "is" } else { "are" }
+            );
 
-        println!("{message}");
+            println!("{message}");
 
-        for item in stale_items {
-            println!("   {}", item.display());
+            for item in stale_items {
+                println!("   {}", item.display());
+            }
         }
 
-        println!("\n💡 Run 'relfa review' to interactively deal with these items,");
-        println!("   or 'relfa archive --all' to archive them all to the Graveyard.");
+        // Display auto-archive warning if applicable
+        if !auto_archive_items.is_empty() {
+            let auto_plural = if auto_archive_items.len() == 1 {
+                "item"
+            } else {
+                "items"
+            };
+
+            if !stale_items.is_empty() {
+                println!();
+            }
+
+            println!(
+                "🤖 {} {} {} eligible for auto-archiving (older than {} days):",
+                auto_archive_items.len(),
+                auto_plural,
+                if auto_archive_items.len() == 1 {
+                    "is"
+                } else {
+                    "are"
+                },
+                self.config.auto_archive_threshold_days
+            );
+
+            for item in &auto_archive_items {
+                println!("   {}", item.display());
+            }
+
+            println!("   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!");
+        }
+
+        println!("\n💡 Run 'relfa review' to interactively deal with these items");
+        if !stale_items.is_empty() && !auto_archive_items.is_empty() {
+            println!("   or 'relfa archive' to auto-archive old files (or 'relfa archive --all' for all).");
+        } else if !stale_items.is_empty() {
+            println!("   or 'relfa archive --all' to archive them all to the Graveyard.");
+        } else if !auto_archive_items.is_empty() {
+            println!("   or 'relfa archive' to auto-archive old files.");
+        }
 
         // Send desktop notification
-        let notification_text = format!(
-            "{} {} in Inbox {} gathering dust. Consider reviewing them!",
-            stale_items.len(),
-            plural,
-            if stale_items.len() == 1 { "is" } else { "are" }
-        );
+        let total_items = stale_items.len() + auto_archive_items.len();
+        let notification_text = if !auto_archive_items.is_empty() {
+            format!(
+                "{} items need attention in Inbox. {} are eligible for auto-archiving!",
+                total_items,
+                auto_archive_items.len()
+            )
+        } else {
+            format!(
+                "{} {} in Inbox {} gathering dust. Consider reviewing them!",
+                stale_items.len(),
+                if stale_items.len() == 1 {
+                    "item"
+                } else {
+                    "items"
+                },
+                if stale_items.len() == 1 { "is" } else { "are" }
+            )
+        };
         self.send_notification("Digital Clutter Detected", &notification_text);
     }
 

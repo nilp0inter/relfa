@@ -210,6 +210,50 @@ pub fn search_graveyard(pattern: &str) -> Result<()> {
     graveyard.search_files(pattern)
 }
 
+pub fn auto_archive_eligible_files(note: Option<&str>) -> Result<()> {
+    let config = Config::load()?;
+    let scanner = Scanner::new(config.clone());
+    let archiver = Archiver::new(config.clone());
+
+    let auto_archive_items = scanner.scan_auto_archive_eligible()?;
+
+    if auto_archive_items.is_empty() {
+        println!("✨ No files eligible for auto-archiving found - all files are within the auto-archive threshold of {} days!", config.auto_archive_threshold_days);
+        return Ok(());
+    }
+
+    println!(
+        "Found {} {} exceeding the auto-archive threshold of {} days:",
+        auto_archive_items.len(),
+        if auto_archive_items.len() == 1 {
+            "file"
+        } else {
+            "files"
+        },
+        config.auto_archive_threshold_days
+    );
+
+    for item in &auto_archive_items {
+        println!("   {}", item.display());
+    }
+
+    println!("\n🤖 Auto-archiving these files...");
+    for item in &auto_archive_items {
+        archiver.archive_item_with_note(item, note)?;
+    }
+
+    println!(
+        "\n🎉 Successfully auto-archived {} {} to the Graveyard!",
+        auto_archive_items.len(),
+        if auto_archive_items.len() == 1 {
+            "file"
+        } else {
+            "files"
+        }
+    );
+    Ok(())
+}
+
 pub fn show_config() -> Result<()> {
     let config = Config::load()?;
     println!("{}", config.display());

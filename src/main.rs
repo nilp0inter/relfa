@@ -23,13 +23,21 @@ fn main() -> Result<()> {
             println!("🔍 Starting interactive review...");
             commands::interactive_review()?;
         }
-        Commands::Archive { item, all, note } => {
+        Commands::Archive {
+            item,
+            all,
+            note,
+            no_auto_archive,
+        } => {
             if all {
                 println!("🪦 Archiving all eligible files...");
                 commands::archive_all_with_note(note.as_deref())?;
             } else if let Some(item) = item {
                 println!("🪦 Archiving {item}...");
                 commands::archive_item_with_note(&item, note.as_deref())?;
+            } else if !no_auto_archive {
+                println!("🤖 Checking for files eligible for auto-archiving...");
+                commands::auto_archive_eligible_files(note.as_deref())?;
             } else {
                 println!("Please specify either --all or an item to archive");
             }

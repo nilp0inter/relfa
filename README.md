@@ -141,12 +141,16 @@ relfa scan
 ```
 🕷️  Scanning Inbox for dusty files...
 ☠️  3 items in ~/Inbox are gathering dust:
-   📄 "old-document.pdf" (file) - last touched 25 days ago (2024-07-08)
-   📄 "project-archive/" (folder) - last touched 18 days ago (2024-07-15)
-   📄 "temp-notes.txt" (file) - last touched 32 days ago (2024-07-01)
+   📄 "old-document.pdf" (file) - last touched 5 days ago (2025-07-29)
+   📄 "project-archive/" (folder) - last touched 4 days ago (2025-07-30)
+   📄 "temp-notes.txt" (file) - last touched 10 days ago (2025-07-24)
 
-💡 Run 'relfa review' to interactively deal with these items,
-   or 'relfa archive --all' to archive them all to the Graveyard.
+🤖 1 item is eligible for auto-archiving (older than 7 days):
+   📄 "temp-notes.txt" (file) - last touched 10 days ago (2025-07-24)
+   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!
+
+💡 Run 'relfa review' to interactively deal with these items
+   or 'relfa archive' to auto-archive old files (or 'relfa archive --all' for all).
 ```
 
 </details>
@@ -182,7 +186,35 @@ relfa archive old-document.pdf --note "Outdated project specification from Q1"
 relfa archive --all --note "Weekly cleanup - $(date +%Y-%m-%d)"
 ```
 
-### 4. 🔍 **Search & Resurrection**
+### 🤖 **Auto-Archive Feature**
+
+Relfa can automatically archive files that exceed the auto-archive threshold when you run `relfa archive` without arguments:
+
+```bash
+# Automatically archive files older than auto_archive_threshold_days (default: 7 days)
+relfa archive
+
+# Disable auto-archiving (shows help message instead)
+relfa archive --no-auto-archive
+
+# Auto-archive with a note
+relfa archive --note "Automated cleanup - $(date +%Y-%m-%d)"
+```
+
+The scan command will warn you about files eligible for auto-archiving:
+
+```
+🕷️  Scanning Inbox for dusty files...
+☠️  2 items in ~/Inbox are gathering dust:
+   📄 "document.pdf" (file) - last touched 5 days ago (2025-07-29)
+   📄 "old-file.txt" (file) - last touched 10 days ago (2025-07-24)
+
+🤖 1 item is eligible for auto-archiving (older than 7 days):
+   📄 "old-file.txt" (file) - last touched 10 days ago (2025-07-24)
+   ⚠️  These will be automatically archived if you run 'relfa archive' without arguments!
+```
+
+### 5. 🔍 **Search & Resurrection**
 
 ```bash
 # Search in graveyard (searches filenames AND epitaph content)
@@ -243,9 +275,10 @@ Relfa uses a TOML configuration file at `~/.config/relfa/config.toml`:
 # Basic settings
 inbox = "/home/user/Inbox"
 graveyard = "/home/user/Graveyard"
-age_threshold_days = 14
-notification = "desktop"  # "desktop" or "cli"
-pager = "less"           # "less", "bat", "more", etc.
+age_threshold_days = 3               # Files older than this show as "stale"
+auto_archive_threshold_days = 7      # Files older than this auto-archive when running 'relfa archive'
+notification = "desktop"             # "desktop" or "cli"
+pager = "less"                      # "less", "bat", "more", etc.
 
 [path_format]
 date_format = "{hostname}/{year}/{month:02}/{day:02}"

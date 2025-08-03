@@ -9,6 +9,8 @@ pub struct Config {
     pub inbox: PathBuf,
     pub graveyard: PathBuf,
     pub age_threshold_days: u32,
+    #[serde(default = "default_auto_archive_threshold")]
+    pub auto_archive_threshold_days: u32,
     pub notification: NotificationType,
     pub path_format: PathFormatConfig,
     #[serde(default = "default_pager")]
@@ -45,6 +47,10 @@ fn default_pager() -> String {
     std::env::var("PAGER").unwrap_or_else(|_| "less".to_string())
 }
 
+fn default_auto_archive_threshold() -> u32 {
+    7
+}
+
 impl Default for Config {
     fn default() -> Self {
         let home = home_dir().unwrap_or_else(|| PathBuf::from("."));
@@ -52,7 +58,8 @@ impl Default for Config {
         Self {
             inbox: home.join("Inbox"),
             graveyard: home.join("Graveyard"),
-            age_threshold_days: 14,
+            age_threshold_days: 3,
+            auto_archive_threshold_days: default_auto_archive_threshold(),
             notification: NotificationType::Cli,
             path_format: PathFormatConfig::default(),
             pager: default_pager(),
@@ -180,10 +187,11 @@ impl Config {
 
     pub fn display(&self) -> String {
         format!(
-            "📂 Inbox: {}\n🪦 Graveyard: {}\n⏰ Age threshold: {} days\n🖥️  Hostname: {}\n🔔 Notifications: {:?}\n📄 Pager: {}\n📁 Path format:\n   Created: {}\n   Modified: {}\n   Archived: {}\n   Date format: {}",
+            "📂 Inbox: {}\n🪦 Graveyard: {}\n⏰ Age threshold: {} days\n🤖 Auto-archive threshold: {} days\n🖥️  Hostname: {}\n🔔 Notifications: {:?}\n📄 Pager: {}\n📁 Path format:\n   Created: {}\n   Modified: {}\n   Archived: {}\n   Date format: {}",
             self.inbox.display(),
             self.graveyard.display(),
             self.age_threshold_days,
+            self.auto_archive_threshold_days,
             self.get_hostname(),
             self.notification,
             self.pager,

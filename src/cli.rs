@@ -26,6 +26,11 @@ pub enum Commands {
         all: bool,
         #[arg(long, help = "Add an epitaph (note) explaining why this was archived")]
         note: Option<String>,
+        #[arg(
+            long,
+            help = "Disable automatic archiving of files exceeding auto-archive threshold"
+        )]
+        no_auto_archive: bool,
     },
     #[command(about = "Resurrect files from the Graveyard back to Inbox (copies, doesn't remove)")]
     Resurrect {
