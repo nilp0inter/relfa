@@ -46,3 +46,4 @@ target/
 # Added by cargo
 
 /target
+.pre-commit-config.yaml
