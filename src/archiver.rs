@@ -428,14 +428,14 @@ impl Archiver {
             Ok(()) => Ok(()),
             Err(_) => {
                 // If that fails, try to fix permissions recursively and then remove
-                self.fix_permissions_recursive(path)?;
+                Self::fix_permissions_recursive(path)?;
                 fs::remove_dir_all(path)
                     .context("Failed to remove directory even after fixing permissions")
             }
         }
     }
 
-    fn fix_permissions_recursive(&self, path: &Path) -> Result<()> {
+    fn fix_permissions_recursive(path: &Path) -> Result<()> {
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -448,18 +448,17 @@ impl Archiver {
 
                 // Recursively fix permissions for contents
                 if let Ok(entries) = fs::read_dir(path) {
-                    for entry in entries {
-                        if let Ok(entry) = entry {
-                            let entry_path = entry.path();
-                            if entry_path.is_dir() {
-                                self.fix_permissions_recursive(&entry_path)?;
-                            } else {
-                                // Make files writable
-                                if let Ok(metadata) = fs::metadata(&entry_path) {
-                                    let mut perms = metadata.permissions();
-                                    perms.set_mode(perms.mode() | 0o600); // Add owner read/write permissions
-                                    let _ = fs::set_permissions(&entry_path, perms); // Ignore errors for broken symlinks
-                                }
+                    for entry in entries.flatten() {
+                        let entry_path = entry.path();
+                        if entry_path.is_dir() {
+                            Self::fix_permissions_recursive(&entry_path)?;
+                        } else {
+                            // Make files writable
+                            if let Ok(metadata) = fs::metadata(&entry_path) {
+                                let mut perms = metadata.permissions();
+                                perms.set_mode(perms.mode() | 0o600); // Add owner read/write permissions
+                                let _ = fs::set_permissions(&entry_path, perms);
+                                // Ignore errors for broken symlinks
                             }
                         }
                     }

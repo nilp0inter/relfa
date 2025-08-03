@@ -46,3 +46,4 @@ target/
 
 /target
 .pre-commit-config.yaml
+.claude
