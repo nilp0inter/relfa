@@ -258,7 +258,28 @@ pub fn auto_archive_eligible_files(note: Option<&str>) -> Result<()> {
 }
 
 pub fn show_config() -> Result<()> {
-    let config = Config::load()?;
+    let config_path = if let Some(config_dir) = dirs::config_dir() {
+        config_dir.join("relfa").join("config.toml")
+    } else {
+        std::path::PathBuf::from(".relfa.toml")
+    };
+
+    let config = if config_path.exists() {
+        // Config exists, try to load it and report any parsing errors
+        match Config::load_without_save() {
+            Ok(config) => config,
+            Err(e) => {
+                eprintln!("❌ Error parsing config file at {}:", config_path.display());
+                eprintln!("   {e}");
+                eprintln!("\n💡 The config file exists but has invalid format.");
+                eprintln!("   Either fix the syntax or delete the file to regenerate defaults.");
+                return Err(e);
+            }
+        }
+    } else {
+        // Config doesn't exist, create it
+        Config::load()?
+    };
     println!("{}", config.display());
     println!(
         "\nConfig file location: {}",

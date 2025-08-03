@@ -63,6 +63,119 @@
                 default = "less";
                 description = "Pager command for viewing files.";
               };
+
+              path_format = lib.mkOption {
+                type = lib.types.submodule {
+                  options = {
+                    created_subdir = lib.mkOption {
+                      type = lib.types.submodule {
+                        options = {
+                          type = lib.mkOption {
+                            type = lib.types.enum [ "original" "symlink" "nothing" ];
+                            default = "original";
+                            description = "Type of subdirectory for created files.";
+                          };
+                          name = lib.mkOption {
+                            type = lib.types.str;
+                            default = "created";
+                            description = "Name of the created subdirectory.";
+                          };
+                          target = lib.mkOption {
+                            type = lib.types.nullOr lib.types.str;
+                            default = null;
+                            description = "Target for symlink type (only used when type is 'symlink').";
+                          };
+                        };
+                      };
+                      default = {
+                        type = "original";
+                        name = "created";
+                      };
+                      description = "Configuration for created files subdirectory.";
+                    };
+
+                    modified_subdir = lib.mkOption {
+                      type = lib.types.submodule {
+                        options = {
+                          type = lib.mkOption {
+                            type = lib.types.enum [ "original" "symlink" "nothing" ];
+                            default = "symlink";
+                            description = "Type of subdirectory for modified files.";
+                          };
+                          name = lib.mkOption {
+                            type = lib.types.str;
+                            default = "modified";
+                            description = "Name of the modified subdirectory.";
+                          };
+                          target = lib.mkOption {
+                            type = lib.types.nullOr lib.types.str;
+                            default = "created";
+                            description = "Target for symlink type (only used when type is 'symlink').";
+                          };
+                        };
+                      };
+                      default = {
+                        type = "symlink";
+                        name = "modified";
+                        target = "created";
+                      };
+                      description = "Configuration for modified files subdirectory.";
+                    };
+
+                    archived_subdir = lib.mkOption {
+                      type = lib.types.submodule {
+                        options = {
+                          type = lib.mkOption {
+                            type = lib.types.enum [ "original" "symlink" "nothing" ];
+                            default = "symlink";
+                            description = "Type of subdirectory for archived files.";
+                          };
+                          name = lib.mkOption {
+                            type = lib.types.str;
+                            default = "archived";
+                            description = "Name of the archived subdirectory.";
+                          };
+                          target = lib.mkOption {
+                            type = lib.types.nullOr lib.types.str;
+                            default = "created";
+                            description = "Target for symlink type (only used when type is 'symlink').";
+                          };
+                        };
+                      };
+                      default = {
+                        type = "symlink";
+                        name = "archived";
+                        target = "created";
+                      };
+                      description = "Configuration for archived files subdirectory.";
+                    };
+
+                    date_format = lib.mkOption {
+                      type = lib.types.str;
+                      default = "{hostname}/{year}/{month:02}/{day:02}";
+                      description = "Date format string for organizing archived files.";
+                    };
+                  };
+                };
+                default = {
+                  created_subdir = {
+                    type = "original";
+                    name = "created";
+                  };
+                  modified_subdir = {
+                    type = "symlink";
+                    name = "modified";
+                    target = "created";
+                  };
+                  archived_subdir = {
+                    type = "symlink";
+                    name = "archived";
+                    target = "created";
+                  };
+                  date_format = "{hostname}/{year}/{month:02}/{day:02}";
+                };
+                description = "Path format configuration for organizing archived files.";
+              };
             };
           };
           default = { };

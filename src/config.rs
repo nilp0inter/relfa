@@ -136,13 +136,16 @@ impl Config {
             // Try to parse, but if it fails due to missing fields, use defaults
             match toml::from_str::<Self>(&content) {
                 Ok(config) => Ok(config),
-                Err(_) => {
-                    // Config format has changed, use defaults and optionally save new format
-                    let config = Self::default();
+                Err(e) => {
                     if auto_save {
+                        // Only fall back to defaults if we're allowed to save (non-display mode)
+                        let config = Self::default();
                         config.save()?;
+                        Ok(config)
+                    } else {
+                        // In display mode, report the actual parsing error
+                        Err(anyhow::anyhow!("Failed to parse config file: {}", e))
                     }
-                    Ok(config)
                 }
             }
         } else {

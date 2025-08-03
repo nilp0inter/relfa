@@ -509,6 +509,28 @@ programs.relfa = {
     auto_archive_threshold_days = 7;     # Files auto-archive
     notification = "desktop";            # "cli" or "desktop"
     pager = "bat";                      # File viewer command
+
+    # Path format configuration (optional - uses defaults if not specified)
+    path_format = {
+      date_format = "{hostname}/{year}/{month:02}/{day:02}";
+      
+      created_subdir = {
+        type = "original";
+        name = "created";
+      };
+      
+      modified_subdir = {
+        type = "symlink";
+        name = "modified";
+        target = "created";
+      };
+      
+      archived_subdir = {
+        type = "symlink";
+        name = "archived";
+        target = "modified";
+      };
+    };
   };
 
   # Systemd timer (optional)
