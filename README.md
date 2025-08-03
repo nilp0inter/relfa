@@ -365,6 +365,191 @@ date_format = "archive-{year}-{month:02}-{day:02}"           # archive-2024-08-1
 
 </details>
 
+## ❄️ Nix Flake Usage
+
+Relfa provides a comprehensive Nix flake with packages and Home Manager modules for declarative configuration and automation.
+
+### 📦 **Package Installation**
+
+#### Direct Usage
+```bash
+# Run relfa directly from the flake
+nix run github:nilp0inter/relfa
+
+# Install to user profile
+nix profile install github:nilp0inter/relfa
+
+# Use in a development shell
+nix shell github:nilp0inter/relfa
+```
+
+#### In a Nix System Configuration
+```nix
+{
+  inputs.relfa.url = "github:nilp0inter/relfa";
+  
+  # In your system configuration
+  environment.systemPackages = [ inputs.relfa.packages.${system}.relfa ];
+}
+```
+
+### 🏠 **Home Manager Integration**
+
+#### Basic Configuration
+```nix
+{
+  inputs.relfa.url = "github:nilp0inter/relfa";
+  
+  # In your home.nix:
+  imports = [ inputs.relfa.homeManagerModules.relfa ];
+  
+  programs.relfa = {
+    enable = true;
+    settings = {
+      age_threshold_days = 5;
+      auto_archive_threshold_days = 14;
+      notification = "desktop";
+      inbox = "${config.home.homeDirectory}/Downloads";
+      graveyard = "${config.home.homeDirectory}/Archive";
+    };
+  };
+}
+```
+
+### ⏰ **Automated Execution with Systemd Timer**
+
+#### Hourly Scan and Auto-Archive (Recommended)
+```nix
+programs.relfa = {
+  enable = true;
+  
+  # Configure desktop notifications and settings
+  settings = {
+    notification = "desktop";
+    age_threshold_days = 3;
+    auto_archive_threshold_days = 7;
+    inbox = "${config.home.homeDirectory}/Inbox";
+    graveyard = "${config.home.homeDirectory}/Graveyard";
+  };
+  
+  # Systemd timer configuration
+  timer = {
+    enable = true;
+    frequency = "hourly";                # Run every hour
+    command = "scan-then-archive";       # First scan, then auto-archive
+    randomizedDelay = "15m";            # Random delay up to 15 minutes
+  };
+};
+```
+
+#### Daily Scan Only (Non-Destructive)
+```nix
+programs.relfa = {
+  enable = true;
+  settings.notification = "desktop";
+  
+  timer = {
+    enable = true;
+    frequency = "daily";
+    command = "scan";                   # Only scan and notify
+    randomizedDelay = "1h";
+  };
+};
+```
+
+#### Custom Schedule Examples
+```nix
+timer = {
+  enable = true;
+  
+  # Every 30 minutes
+  frequency = "*:0/30";
+  
+  # Every 6 hours
+  frequency = "0/6:00:00";
+  
+  # Weekdays at 9 AM
+  frequency = "Mon..Fri 09:00:00";
+  
+  # Daily at 2 PM with 2-hour random delay
+  frequency = "daily";
+  randomizedDelay = "2h";
+};
+```
+
+### 🎛️ **Configuration Options**
+
+<details>
+<summary>📋 Complete Configuration Reference</summary>
+
+```nix
+programs.relfa = {
+  enable = true;
+  
+  # Package override (optional)
+  package = inputs.relfa.packages.${pkgs.system}.relfa;
+  
+  # Core settings
+  settings = {
+    inbox = "${config.home.homeDirectory}/Inbox";
+    graveyard = "${config.home.homeDirectory}/Graveyard";
+    age_threshold_days = 3;              # Files show as "stale"
+    auto_archive_threshold_days = 7;     # Files auto-archive
+    notification = "desktop";            # "cli" or "desktop"
+    pager = "bat";                      # File viewer command
+  };
+  
+  # Systemd timer (optional)
+  timer = {
+    enable = true;
+    frequency = "daily";                # systemd OnCalendar format
+    command = "scan-then-archive";      # "scan", "archive", "scan-then-archive"
+    randomizedDelay = "1h";            # Prevent simultaneous execution
+  };
+};
+```
+
+</details>
+
+### 🔔 **Notification Examples**
+
+#### What You'll See with Timer Enabled:
+- **Scan results**: `🔍 Scan Complete: 2 files gathering dust in Inbox`
+- **Auto-archive warnings**: `🤖 Auto-archived 1 file to Graveyard (old-document.pdf)`
+- **Clean state**: `✨ No files need attention - Inbox is clean!`
+
+### 🚀 **Getting Started with Nix**
+
+1. **Add relfa to your flake inputs:**
+   ```nix
+   inputs.relfa.url = "github:nilp0inter/relfa";
+   ```
+
+2. **Import the Home Manager module:**
+   ```nix
+   imports = [ inputs.relfa.homeManagerModules.relfa ];
+   ```
+
+3. **Enable with basic configuration:**
+   ```nix
+   programs.relfa.enable = true;
+   ```
+
+4. **Rebuild your system:**
+   ```bash
+   home-manager switch  # For home-manager
+   # or
+   nixos-rebuild switch  # For NixOS
+   ```
+
+5. **Check timer status:**
+   ```bash
+   systemctl --user status relfa.timer
+   systemctl --user status relfa.service
+   ```
+
+The Nix flake provides a **zero-configuration** setup that works out of the box, with full **declarative control** over all settings and automation!
+
 ## 📝 Epitaphs - Digital Memory Keeping
 
 Epitaphs are optional notes that explain why files were archived, creating a historical record of your digital archaeology:
