@@ -44,6 +44,11 @@
             name = "fmt";
             command = "treefmt";
           }
+          {
+            help = "Install git hooks";
+            name = "install-hooks";
+            command = "pre-commit install";
+          }
         ];
 
         env = [
@@ -54,7 +59,11 @@
         ];
 
         devshell.startup.pre-commit-install = {
-          text = config.pre-commit.installationScript;
+          text = ''
+            ${config.pre-commit.installationScript}
+            git config --local --unset core.hooksPath || true
+            pre-commit install --install-hooks
+          '';
         };
       };
     };
