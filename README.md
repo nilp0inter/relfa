@@ -420,6 +420,14 @@ nix shell github:nilp0inter/relfa
       notification = "desktop";
       inbox = "${config.home.homeDirectory}/Downloads";
       graveyard = "${config.home.homeDirectory}/Archive";
+      
+      # Required path_format section
+      path_format = {
+        date_format = "{hostname}/{year}/{month:02}/{day:02}";
+        created_subdir = { type = "original"; name = "created"; };
+        modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
+        archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
+      };
     };
   };
 }
@@ -440,6 +448,14 @@ programs.relfa = {
     auto_archive_threshold_days = 7;
     inbox = "${config.home.homeDirectory}/Inbox";
     graveyard = "${config.home.homeDirectory}/Graveyard";
+    
+    # Required path_format section
+    path_format = {
+      date_format = "{hostname}/{year}/{month:02}/{day:02}";
+      created_subdir = { type = "original"; name = "created"; };
+      modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
+      archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
+    };
   };
 
   # Systemd timer configuration
@@ -457,7 +473,17 @@ programs.relfa = {
 ```nix
 programs.relfa = {
   enable = true;
-  settings.notification = "desktop";
+  settings = {
+    notification = "desktop";
+    
+    # Required path_format section
+    path_format = {
+      date_format = "{hostname}/{year}/{month:02}/{day:02}";
+      created_subdir = { type = "original"; name = "created"; };
+      modified_subdir = { type = "symlink"; name = "modified"; target = "created"; };
+      archived_subdir = { type = "symlink"; name = "archived"; target = "modified"; };
+    };
+  };
 
   timer = {
     enable = true;
