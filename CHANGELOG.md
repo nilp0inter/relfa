@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-08-03
+
+### Fixed
+- **Cross-device archiving**: Fixed "Invalid cross-device link" error when archiving files across different filesystems
+- **Relative symlinks**: All symlinks now use relative paths instead of absolute paths to prevent cross-device issues
+- **Directory archiving with symlinks**: Enhanced directory copying to properly handle broken symlinks and Windows-style symlinks
+- **Permission handling**: Added robust permission fixing for directories that can't be removed due to restrictive permissions
+
+### Technical
+- Added `calculate_relative_path()` method for computing relative symlink targets
+- Enhanced `move_item()` with cross-device fallback using copy+remove
+- Improved `copy_dir_all()` with proper symlink preservation
+- Added `remove_dir_with_permissions()` and `fix_permissions_recursive()` for handling permission issues
+- Cross-platform symlink handling for both Unix and Windows
+
 ## [0.2.1] - 2025-08-03
 
 ### Fixed

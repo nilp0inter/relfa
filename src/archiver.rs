@@ -53,7 +53,7 @@ impl Archiver {
 
             if i == 0 {
                 // Move the original file to the first location
-                fs::rename(&item.path, &target_path).context("Failed to move item to graveyard")?;
+                self.move_item(&item.path, &target_path).context("Failed to move item to graveyard")?;
                 primary_path = Some(target_path.clone());
             } else {
                 // Copy to additional locations
@@ -401,28 +401,142 @@ impl Archiver {
         Ok(())
     }
 
+    fn move_item(&self, src: &Path, dst: &Path) -> Result<()> {
+        // Try rename first (faster for same filesystem)
+        match fs::rename(src, dst) {
+            Ok(()) => Ok(()),
+            Err(e) if e.raw_os_error() == Some(18) => {
+                // Error 18 is "Invalid cross-device link" - use copy + remove instead
+                if src.is_dir() {
+                    copy_dir_all(src, dst)?;
+                    self.remove_dir_with_permissions(src).context("Failed to remove source directory after copy")?;
+                } else {
+                    fs::copy(src, dst).context("Failed to copy file across devices")?;
+                    fs::remove_file(src).context("Failed to remove source file after copy")?;
+                }
+                Ok(())
+            }
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    fn remove_dir_with_permissions(&self, path: &Path) -> Result<()> {
+        // First try normal removal
+        match fs::remove_dir_all(path) {
+            Ok(()) => Ok(()),
+            Err(_) => {
+                // If that fails, try to fix permissions recursively and then remove
+                self.fix_permissions_recursive(path)?;
+                fs::remove_dir_all(path).context("Failed to remove directory even after fixing permissions")
+            }
+        }
+    }
+
+    fn fix_permissions_recursive(&self, path: &Path) -> Result<()> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            
+            // Make the directory writable
+            if path.is_dir() {
+                let mut perms = fs::metadata(path)?.permissions();
+                perms.set_mode(perms.mode() | 0o700); // Add owner write/execute permissions
+                fs::set_permissions(path, perms)?;
+                
+                // Recursively fix permissions for contents
+                if let Ok(entries) = fs::read_dir(path) {
+                    for entry in entries {
+                        if let Ok(entry) = entry {
+                            let entry_path = entry.path();
+                            if entry_path.is_dir() {
+                                self.fix_permissions_recursive(&entry_path)?;
+                            } else {
+                                // Make files writable
+                                if let Ok(metadata) = fs::metadata(&entry_path) {
+                                    let mut perms = metadata.permissions();
+                                    perms.set_mode(perms.mode() | 0o600); // Add owner read/write permissions
+                                    let _ = fs::set_permissions(&entry_path, perms); // Ignore errors for broken symlinks
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #[cfg(windows)]
+        {
+            // On Windows, try to remove read-only attribute
+            let _ = fs::metadata(path).and_then(|metadata| {
+                let mut perms = metadata.permissions();
+                perms.set_readonly(false);
+                fs::set_permissions(path, perms)
+            });
+        }
+        Ok(())
+    }
+
     fn ensure_directory_exists(&self, path: &Path) -> Result<()> {
         fs::create_dir_all(path).context("Failed to create directory")
     }
 
     fn create_symlink(&self, target: &Path, link: &Path) -> Result<()> {
+        // Calculate relative path from link to target to avoid cross-device issues
+        let relative_target = self.calculate_relative_path(link.parent().unwrap(), target)?;
+        
         #[cfg(unix)]
         {
-            std::os::unix::fs::symlink(target, link).context("Failed to create symlink")?;
+            std::os::unix::fs::symlink(&relative_target, link).context("Failed to create symlink")?;
         }
 
         #[cfg(windows)]
         {
             if target.is_dir() {
-                std::os::windows::fs::symlink_dir(target, link)
+                std::os::windows::fs::symlink_dir(&relative_target, link)
                     .context("Failed to create directory symlink")?;
             } else {
-                std::os::windows::fs::symlink_file(target, link)
+                std::os::windows::fs::symlink_file(&relative_target, link)
                     .context("Failed to create file symlink")?;
             }
         }
 
         Ok(())
+    }
+
+    fn calculate_relative_path(&self, from_dir: &Path, to_path: &Path) -> Result<PathBuf> {
+        let from_abs = from_dir.canonicalize()
+            .unwrap_or_else(|_| from_dir.to_path_buf());
+        let to_abs = to_path.canonicalize()
+            .unwrap_or_else(|_| to_path.to_path_buf());
+
+        // Find common ancestor
+        let from_components: Vec<_> = from_abs.components().collect();
+        let to_components: Vec<_> = to_abs.components().collect();
+
+        let common_len = from_components
+            .iter()
+            .zip(to_components.iter())
+            .take_while(|(a, b)| a == b)
+            .count();
+
+        // Build relative path
+        let mut relative_path = PathBuf::new();
+
+        // Add ".." for each directory we need to go up from the common ancestor
+        for _ in common_len..from_components.len() {
+            relative_path.push("..");
+        }
+
+        // Add the path components from common ancestor to target
+        for component in &to_components[common_len..] {
+            relative_path.push(component.as_os_str());
+        }
+
+        // Handle the case where we're in the same directory
+        if relative_path.as_os_str().is_empty() {
+            relative_path.push(to_path.file_name().unwrap());
+        }
+
+        Ok(relative_path)
     }
 }
 
@@ -431,10 +545,32 @@ fn copy_dir_all(src: &Path, dst: &Path) -> Result<()> {
     for entry in fs::read_dir(src)? {
         let entry = entry?;
         let ty = entry.file_type()?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        
         if ty.is_dir() {
-            copy_dir_all(&entry.path(), &dst.join(entry.file_name()))?;
+            copy_dir_all(&src_path, &dst_path)?;
+        } else if ty.is_symlink() {
+            // Handle symlinks by copying the symlink itself, not following it
+            #[cfg(unix)]
+            {
+                if let Ok(target) = fs::read_link(&src_path) {
+                    std::os::unix::fs::symlink(&target, &dst_path).context("Failed to copy symlink")?;
+                }
+            }
+            #[cfg(windows)]
+            {
+                // On Windows, try to copy as file/dir symlink based on target
+                if let Ok(target) = fs::read_link(&src_path) {
+                    if target.is_dir() {
+                        std::os::windows::fs::symlink_dir(&target, &dst_path).context("Failed to copy directory symlink")?;
+                    } else {
+                        std::os::windows::fs::symlink_file(&target, &dst_path).context("Failed to copy file symlink")?;
+                    }
+                }
+            }
         } else {
-            fs::copy(entry.path(), dst.join(entry.file_name()))?;
+            fs::copy(&src_path, &dst_path).context("Failed to copy file")?;
         }
     }
     Ok(())
