@@ -193,9 +193,19 @@ This command will download the source code, compile it, and place the `relfa` bi
 <details>
 <summary><strong>Pre-compiled Binaries</strong></summary>
 
-At the moment, pre-compiled binaries are not officially provided. I am waiting to see if there is sufficient user interest before setting up a build pipeline for different platforms.
+Pre-compiled binaries are available for Linux and macOS from the [releases page](https://github.com/nilp0inter/relfa/releases).
 
-If you would like to see official binaries for your operating system (e.g., Linux x86_64, macOS, Windows), please **[open an issue on GitHub](https://github.com/nilp0inter/relfa/issues)**. This will help me gauge demand and prioritize which platforms to support.
+**Supported Platforms:**
+- Linux x86_64 (`relfa-VERSION-x86_64-unknown-linux-musl`)
+- macOS Intel (`relfa-VERSION-x86_64-apple-darwin`)
+- macOS Apple Silicon (`relfa-VERSION-aarch64-apple-darwin`)
+
+**Installation:**
+1. Download the appropriate binary for your platform from the [latest release](https://github.com/nilp0inter/relfa/releases/latest)
+2. Make it executable: `chmod +x relfa-*`
+3. Copy it to a directory in your PATH: `cp relfa-* ~/.local/bin/relfa` (or `/usr/local/bin/relfa`)
+
+If you need binaries for other platforms, please **[open an issue on GitHub](https://github.com/nilp0inter/relfa/issues)**.
 
 </details>
 

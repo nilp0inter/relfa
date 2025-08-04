@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.8 - 2025-08-04
+- Added automated GitHub releases with cross-platform binaries
+- Added git hook to automatically update Cargo.lock when Cargo.toml changes
+- Fixed Linux binary compatibility by using musl instead of glibc
+- Added pre-compiled binaries for Linux x86_64, macOS Intel, and macOS Apple Silicon
+
+## 0.2.6 - 2025-08-04
+- Fixed CI workflow to properly handle publish outputs and create GitHub releases
+
 ## 0.2.5 - 2025-08-04
 - Fixed `relfa config` command output errors
 - Fixed Home Manager module settings validation
