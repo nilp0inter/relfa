@@ -2,6 +2,7 @@
 name = "relfa"
 version = "0.2.5"
 edition = "2021"
+authors = ["Roberto Abdelkader Martínez Pérez <robertomartinezp@gmail.com>"]
 description = "A gentle digital gravedigger to lovingly archive your old files."
 license = "MIT"
 repository = "https://github.com/nilp0inter/relfa"
