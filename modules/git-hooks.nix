@@ -38,6 +38,16 @@
               files = "\\.(rs|toml)$";
               pass_filenames = false;
             };
+
+            # Update Cargo.lock when Cargo.toml is modified
+            cargo-lock = {
+              enable = true;
+              name = "cargo-lock";
+              entry = "${pkgs.cargo}/bin/cargo generate-lockfile";
+              language = "system";
+              files = "Cargo\\.toml$";
+              pass_filenames = false;
+            };
           };
         };
       };
