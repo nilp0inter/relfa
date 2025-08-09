@@ -2,6 +2,9 @@ use anyhow::{Context, Result};
 use chrono::{DateTime, Duration, Utc};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration as StdDuration;
 use walkdir::WalkDir;
 
 use crate::config::{Config, NotificationType};
@@ -386,28 +389,47 @@ impl Scanner {
 
     fn send_notification(&self, title: &str, body: &str) {
         if matches!(self.config.notification, NotificationType::Desktop) {
-            #[cfg(not(target_os = "windows"))]
-            {
-                if let Err(e) = notify_rust::Notification::new()
-                    .summary(title)
-                    .body(body)
-                    .icon("folder")
-                    .timeout(notify_rust::Timeout::Milliseconds(5000))
-                    .show()
+            // Create owned copies for the thread
+            let title = title.to_string();
+            let body = body.to_string();
+
+            // Use a channel to communicate between threads
+            let (tx, rx) = mpsc::channel();
+
+            // Spawn a thread to send the notification
+            thread::spawn(move || {
+                #[cfg(not(target_os = "windows"))]
                 {
+                    let result = notify_rust::Notification::new()
+                        .summary(&title)
+                        .body(&body)
+                        .icon("folder")
+                        .timeout(notify_rust::Timeout::Milliseconds(5000))
+                        .show();
+                    let _ = tx.send(result);
+                }
+
+                #[cfg(target_os = "windows")]
+                {
+                    let result = notify_rust::Notification::new()
+                        .summary(&title)
+                        .body(&body)
+                        .timeout(notify_rust::Timeout::Milliseconds(5000))
+                        .show();
+                    let _ = tx.send(result);
+                }
+            });
+
+            // Wait for the notification with a timeout
+            match rx.recv_timeout(StdDuration::from_secs(2)) {
+                Ok(Ok(_)) => {
+                    // Notification sent successfully
+                }
+                Ok(Err(e)) => {
                     eprintln!("Failed to send desktop notification: {e}");
                 }
-            }
-
-            #[cfg(target_os = "windows")]
-            {
-                if let Err(e) = notify_rust::Notification::new()
-                    .summary(title)
-                    .body(body)
-                    .timeout(notify_rust::Timeout::Milliseconds(5000))
-                    .show()
-                {
-                    eprintln!("Failed to send desktop notification: {}", e);
+                Err(_) => {
+                    eprintln!("Desktop notification timed out after 2 seconds");
                 }
             }
         }
