@@ -91,6 +91,7 @@ For each file, you will be prompted to choose an action:
 -   `(o)pen`: Open the file with its default application.
 -   `(s)kip`: Do nothing and move to the next file.
 -   `(q)uit`: Exit the review session.
+-   `(?)help`: Show a detailed help message with all available actions.
 
 </details>
 

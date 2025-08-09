@@ -37,7 +37,7 @@ pub fn interactive_review() -> Result<()> {
         println!("[{}/{}] {}", i + 1, stale_items.len(), item.display());
 
         loop {
-            print!("Action: (a)rchive, (n)ote+archive, (t)ouch, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit? ");
+            print!("Action: (a)rchive, (n)ote+archive, (t)ouch, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit, (?) help? ");
             io::stdout().flush()?;
 
             let mut input = String::new();
@@ -116,10 +116,29 @@ pub fn interactive_review() -> Result<()> {
                     println!("📊 Summary: {archived_count} processed, {skipped_count} skipped");
                     return Ok(());
                 }
-                _ => {
+                "?" | "help" => {
+                    println!("\n📚 Available actions:");
+                    println!("  (a)rchive      - Move the file to the graveyard");
+                    println!("  (n)ote+archive - Archive with an epitaph (descriptive note)");
                     println!(
-                        "Please enter 'a' for archive, 'n' for note+archive, 't' for touch, 'd' for delete, 'v' for view, 'o' for open, 's' for skip, or 'q' to quit"
+                        "  (t)ouch        - Update modification time to keep for another {} days",
+                        config.age_threshold_days
                     );
+                    println!(
+                        "  (d)elete       - Permanently delete the file (requires confirmation)"
+                    );
+                    println!(
+                        "  (v)iew         - Preview file content using pager ({})",
+                        config.pager
+                    );
+                    println!("  (o)pen         - Open file with default application");
+                    println!("  (s)kip         - Skip this file and move to the next");
+                    println!("  (q)uit         - Exit the review session");
+                    println!("  (?)help        - Show this help message\n");
+                    continue;
+                }
+                _ => {
+                    println!("Invalid option. Press '?' for help or enter a valid action.");
                     continue;
                 }
             }
