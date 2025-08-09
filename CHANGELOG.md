@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.1 - 2025-08-09
+- Fixed notification system hanging when notification daemon is down
+
+## 0.4.0 - 2025-08-09
+- Added minimum notification count requirement before auto-archival
+- Added single key press support for review actions
+- Added help menu in review mode
+- Added touch command in review mode to update file timestamps
+
+## 0.3.0 - 2025-08-09
+- Major UX improvements for interactive review mode
+
 ## 0.2.8 - 2025-08-04
 - Added automated GitHub releases with cross-platform binaries
 - Added git hook to automatically update Cargo.lock when Cargo.toml changes
