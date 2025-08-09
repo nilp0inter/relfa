@@ -1,5 +1,9 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
+use crossterm::{
+    event::{self, Event, KeyCode},
+    terminal::{disable_raw_mode, enable_raw_mode},
+};
 use std::io::{self, Write};
 
 use crate::archiver::Archiver;
@@ -7,6 +11,26 @@ use crate::config::Config;
 use crate::graveyard::GraveyardManager;
 use crate::scanner::{Scanner, StaleItem};
 use crate::utils::{delete_item, open_file_with_default, touch_item, view_file_with_pager};
+
+fn get_single_keypress() -> Result<char> {
+    enable_raw_mode()?;
+
+    let key = loop {
+        if let Event::Key(key_event) = event::read()? {
+            let ch = match key_event.code {
+                KeyCode::Char(c) => c,
+                KeyCode::Enter => '\n',
+                KeyCode::Esc => '\x1b',
+                _ => continue,
+            };
+            break ch;
+        }
+    };
+
+    disable_raw_mode()?;
+    println!(); // Move to next line after keypress
+    Ok(key)
+}
 
 pub fn scan_inbox() -> Result<()> {
     let config = Config::load_without_save()?;
@@ -36,21 +60,41 @@ pub fn interactive_review() -> Result<()> {
     for (i, item) in stale_items.iter().enumerate() {
         println!("[{}/{}] {}", i + 1, stale_items.len(), item.display());
 
+        // Show help automatically for the first file
+        if i == 0 {
+            println!("\n📚 Available actions:");
+            println!("  a - Archive: Move the file to the graveyard");
+            println!("  n - Note+archive: Archive with an epitaph (descriptive note)");
+            println!(
+                "  t - Touch: Update modification time to keep for another {} days",
+                config.age_threshold_days
+            );
+            println!("  d - Delete: Permanently delete the file (requires confirmation)");
+            println!(
+                "  v - View: Preview file content using pager ({})",
+                config.pager
+            );
+            println!("  o - Open: Open file with default application");
+            println!("  s - Skip: Skip this file and move to the next");
+            println!("  q - Quit: Exit the review session");
+            println!("  ? - Help: Show this help message\n");
+        }
+
         loop {
-            print!("Action: (a)rchive, (n)ote+archive, (t)ouch, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit, (?) help? ");
+            print!("Action [a/n/t/d/v/o/s/q/?]: ");
             io::stdout().flush()?;
 
-            let mut input = String::new();
-            io::stdin().read_line(&mut input)?;
-            let input = input.trim().to_lowercase();
+            let input = get_single_keypress()?.to_lowercase().next().unwrap_or('\0');
 
-            match input.as_str() {
-                "a" | "archive" => {
+            match input {
+                'a' => {
                     archiver.archive_item_with_note(item, None)?;
                     archived_count += 1;
                     break;
                 }
-                "n" | "note" => {
+                'n' => {
+                    // Temporarily disable raw mode for multi-line input
+                    disable_raw_mode()?;
                     print!("📝 Enter epitaph note (why archive this?): ");
                     io::stdout().flush()?;
 
@@ -66,14 +110,16 @@ pub fn interactive_review() -> Result<()> {
                     archived_count += 1;
                     break;
                 }
-                "t" | "touch" => {
+                't' => {
                     touch_item(&item.path)?;
                     println!("✨ Updated modification time for '{}' - file will be kept for another {} days", 
                              item.name, config.age_threshold_days);
                     skipped_count += 1; // Count as skipped since we're keeping it
                     break;
                 }
-                "d" | "delete" => {
+                'd' => {
+                    // Temporarily disable raw mode for confirmation input
+                    disable_raw_mode()?;
                     println!(
                         "⚠️  WARNING: This will permanently delete '{}' and cannot be undone!",
                         item.name
@@ -98,47 +144,47 @@ pub fn interactive_review() -> Result<()> {
                         continue; // Show the prompt again
                     }
                 }
-                "v" | "view" => {
+                'v' => {
+                    // Temporarily disable raw mode for pager
+                    disable_raw_mode()?;
                     view_file_with_pager(&item.path, &config)?;
                     continue; // Continue the loop to show the prompt again
                 }
-                "o" | "open" => {
+                'o' => {
                     open_file_with_default(&item.path)?;
                     continue; // Continue the loop to show the prompt again
                 }
-                "s" | "skip" => {
+                's' => {
                     println!("⏭️  Skipped '{}'", item.name);
                     skipped_count += 1;
                     break;
                 }
-                "q" | "quit" => {
+                'q' => {
                     println!("\n🛑 Review cancelled.");
                     println!("📊 Summary: {archived_count} processed, {skipped_count} skipped");
                     return Ok(());
                 }
-                "?" | "help" => {
+                '?' => {
                     println!("\n📚 Available actions:");
-                    println!("  (a)rchive      - Move the file to the graveyard");
-                    println!("  (n)ote+archive - Archive with an epitaph (descriptive note)");
+                    println!("  a - Archive: Move the file to the graveyard");
+                    println!("  n - Note+archive: Archive with an epitaph (descriptive note)");
                     println!(
-                        "  (t)ouch        - Update modification time to keep for another {} days",
+                        "  t - Touch: Update modification time to keep for another {} days",
                         config.age_threshold_days
                     );
+                    println!("  d - Delete: Permanently delete the file (requires confirmation)");
                     println!(
-                        "  (d)elete       - Permanently delete the file (requires confirmation)"
-                    );
-                    println!(
-                        "  (v)iew         - Preview file content using pager ({})",
+                        "  v - View: Preview file content using pager ({})",
                         config.pager
                     );
-                    println!("  (o)pen         - Open file with default application");
-                    println!("  (s)kip         - Skip this file and move to the next");
-                    println!("  (q)uit         - Exit the review session");
-                    println!("  (?)help        - Show this help message\n");
+                    println!("  o - Open: Open file with default application");
+                    println!("  s - Skip: Skip this file and move to the next");
+                    println!("  q - Quit: Exit the review session");
+                    println!("  ? - Help: Show this help message\n");
                     continue;
                 }
                 _ => {
-                    println!("Invalid option. Press '?' for help or enter a valid action.");
+                    println!("Invalid key '{input}'. Press '?' for help.");
                     continue;
                 }
             }
