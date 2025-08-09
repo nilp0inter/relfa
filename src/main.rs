@@ -7,6 +7,7 @@ mod commands;
 mod config;
 mod graveyard;
 mod scanner;
+mod state;
 mod utils;
 
 use cli::{Cli, Commands};

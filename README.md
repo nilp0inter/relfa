@@ -49,7 +49,7 @@ This tool isn’t about perfection. It’s about being present for what we’ve 
 
 ## Features
 
--   **Dual-Threshold System**: Relfa uses two time limits. A "soft" threshold gently notifies you of stale files, while a "hard" threshold automatically archives them, keeping your workspace tidy without constant intervention.
+-   **Dual-Threshold System with Notification Protection**: Relfa uses two time limits. A "soft" threshold gently notifies you of stale files, while a "hard" threshold automatically archives them. Files must be notified multiple times before auto-archival, protecting against aggressive cleanup on sporadically-used computers.
 -   **Flexible Archival**: Files are stored in a highly-organized "graveyard." Using symlinks, you can browse archived files by their creation, modification, or archival date, all without duplicating a single file.
 -   **Interactive Review**: For files that need a personal touch, the `review` command lets you process them one-by-one with options to archive, delete, view, open, or skip.
 -   **Epitaphs for Posterity**: When archiving, you can attach an "epitaph" — a note explaining the file's context. These notes are stored alongside the file and are fully searchable.
@@ -243,6 +243,11 @@ age_threshold_days = 3
 # archived when you run `relfa archive` without any arguments.
 auto_archive_threshold_days = 7
 
+# Minimum number of times a file must be notified to the user
+# before it becomes eligible for auto-archiving. Protects against
+# auto-archiving on computers that are used sporadically.
+auto_archive_min_scans = 24
+
 # How to deliver notifications. Can be "cli" or "desktop".
 notification = "desktop"
 
@@ -317,6 +322,7 @@ For users of [Nix](https://nixos.org/) and [Home Manager](https://github.com/nix
         graveyard = "${config.home.homeDirectory}/Archive";
         age_threshold_days = 5;
         auto_archive_threshold_days = 14;
+        auto_archive_min_scans = 24;
         notification = "desktop";
 
         # The `path_format` block is required.

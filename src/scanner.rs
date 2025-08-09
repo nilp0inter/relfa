@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 use crate::config::{Config, NotificationType};
+use crate::state::NotificationState;
 
 #[derive(Debug, Clone)]
 pub struct StaleItem {
@@ -13,6 +14,7 @@ pub struct StaleItem {
     pub last_modified: DateTime<Utc>,
     pub is_directory: bool,
     pub age_days: i64,
+    pub notification_count: u32,
 }
 
 impl StaleItem {
@@ -38,11 +40,26 @@ impl Scanner {
     }
 
     pub fn scan_inbox(&self) -> Result<Vec<StaleItem>> {
+        self.scan_inbox_with_state(false)
+    }
+
+    pub fn scan_inbox_with_notification_tracking(&self) -> Result<Vec<StaleItem>> {
+        self.scan_inbox_with_state(true)
+    }
+
+    fn scan_inbox_with_state(&self, track_notifications: bool) -> Result<Vec<StaleItem>> {
         if !self.config.inbox.exists() {
             return Ok(vec![]);
         }
 
+        let mut state = if track_notifications {
+            Some(NotificationState::load().unwrap_or_default())
+        } else {
+            None
+        };
+
         let mut stale_items = Vec::new();
+        let mut currently_stale_files = std::collections::HashSet::new();
         let cutoff_date = Utc::now() - Duration::days(self.config.age_threshold_days as i64);
 
         for entry in fs::read_dir(&self.config.inbox).context("Failed to read inbox directory")? {
@@ -58,15 +75,39 @@ impl Scanner {
                         .unwrap_or("unknown")
                         .to_string();
 
+                    // Track that this file is currently stale
+                    currently_stale_files.insert(name.clone());
+
+                    let notification_count = if let Some(ref mut state) = state {
+                        // Get current count and increment it
+                        let current_count = state.get_notification_count(&name);
+                        state.increment_notification_count(&name);
+                        current_count + 1 // Return what the count will be after this scan
+                    } else {
+                        // When not tracking, just load state to get current count
+                        NotificationState::load()
+                            .unwrap_or_default()
+                            .get_notification_count(&name)
+                    };
+
                     stale_items.push(StaleItem {
                         path: path.clone(),
                         name,
                         last_modified,
                         is_directory: path.is_dir(),
                         age_days,
+                        notification_count,
                     });
                 }
             }
+        }
+
+        // Save the updated state if we were tracking
+        if let Some(mut state) = state {
+            // Clean up entries for files that are no longer stale
+            // This includes files that were deleted, modified, or are now younger than threshold
+            state.retain_only_files(&currently_stale_files);
+            state.save()?;
         }
 
         Ok(stale_items)
@@ -77,6 +118,7 @@ impl Scanner {
             return Ok(vec![]);
         }
 
+        let state = NotificationState::load().unwrap_or_default();
         let mut auto_archive_items = Vec::new();
         let cutoff_date =
             Utc::now() - Duration::days(self.config.auto_archive_threshold_days as i64);
@@ -94,18 +136,68 @@ impl Scanner {
                         .unwrap_or("unknown")
                         .to_string();
 
-                    auto_archive_items.push(StaleItem {
-                        path: path.clone(),
-                        name,
-                        last_modified,
-                        is_directory: path.is_dir(),
-                        age_days,
-                    });
+                    let notification_count = state.get_notification_count(&name);
+
+                    // Only eligible if it has been notified enough times
+                    if notification_count >= self.config.auto_archive_min_scans {
+                        auto_archive_items.push(StaleItem {
+                            path: path.clone(),
+                            name,
+                            last_modified,
+                            is_directory: path.is_dir(),
+                            age_days,
+                            notification_count,
+                        });
+                    }
                 }
             }
         }
 
         Ok(auto_archive_items)
+    }
+
+    // New method to get items that will be eligible after more scans
+    pub fn scan_pending_auto_archive(&self) -> Result<Vec<StaleItem>> {
+        if !self.config.inbox.exists() {
+            return Ok(vec![]);
+        }
+
+        let state = NotificationState::load().unwrap_or_default();
+        let mut pending_items = Vec::new();
+        let cutoff_date =
+            Utc::now() - Duration::days(self.config.auto_archive_threshold_days as i64);
+
+        for entry in fs::read_dir(&self.config.inbox).context("Failed to read inbox directory")? {
+            let entry = entry.context("Failed to read directory entry")?;
+            let path = entry.path();
+
+            if let Some(last_modified) = self.get_last_modified_time(&path)? {
+                if last_modified < cutoff_date {
+                    let age_days = (Utc::now() - last_modified).num_days();
+                    let name = path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or("unknown")
+                        .to_string();
+
+                    let notification_count = state.get_notification_count(&name);
+
+                    // Pending if old enough but not notified enough times yet
+                    if notification_count < self.config.auto_archive_min_scans {
+                        pending_items.push(StaleItem {
+                            path: path.clone(),
+                            name,
+                            last_modified,
+                            is_directory: path.is_dir(),
+                            age_days,
+                            notification_count,
+                        });
+                    }
+                }
+            }
+        }
+
+        Ok(pending_items)
     }
 
     fn get_last_modified_time(&self, path: &Path) -> Result<Option<DateTime<Utc>>> {
@@ -151,10 +243,11 @@ impl Scanner {
     }
 
     pub fn display_scan_results(&self, stale_items: &[StaleItem]) {
-        // Also check for auto-archive eligible items
+        // Check for auto-archive eligible and pending items
         let auto_archive_items = self.scan_auto_archive_eligible().unwrap_or_default();
+        let pending_items = self.scan_pending_auto_archive().unwrap_or_default();
 
-        if stale_items.is_empty() && auto_archive_items.is_empty() {
+        if stale_items.is_empty() && auto_archive_items.is_empty() && pending_items.is_empty() {
             println!("✨ No dusty items found in your Inbox! All clean and tidy.");
             self.send_notification(
                 "Relfa Scan Complete",
@@ -180,11 +273,48 @@ impl Scanner {
             println!("{message}");
 
             for item in stale_items {
-                println!("   {}", item.display());
+                let scan_info = if item.notification_count > 0 {
+                    format!(" [seen {} times]", item.notification_count)
+                } else {
+                    String::new()
+                };
+                println!("   {}{}", item.display(), scan_info);
             }
         }
 
-        // Display auto-archive warning if applicable
+        // Display pending auto-archive items
+        if !pending_items.is_empty() {
+            if !stale_items.is_empty() {
+                println!();
+            }
+
+            println!(
+                "⏳ {} {} old enough for auto-archiving but {} more scans:",
+                pending_items.len(),
+                if pending_items.len() == 1 {
+                    "item"
+                } else {
+                    "items"
+                },
+                if pending_items.len() == 1 {
+                    "needs"
+                } else {
+                    "need"
+                }
+            );
+
+            for item in &pending_items {
+                let scans_needed = self.config.auto_archive_min_scans - item.notification_count;
+                println!(
+                    "   {} [needs {} more {}]",
+                    item.display(),
+                    scans_needed,
+                    if scans_needed == 1 { "scan" } else { "scans" }
+                );
+            }
+        }
+
+        // Display auto-archive eligible items
         if !auto_archive_items.is_empty() {
             let auto_plural = if auto_archive_items.len() == 1 {
                 "item"
@@ -192,24 +322,27 @@ impl Scanner {
                 "items"
             };
 
-            if !stale_items.is_empty() {
+            if !stale_items.is_empty() || !pending_items.is_empty() {
                 println!();
             }
 
             println!(
-                "🤖 {} {} {} eligible for auto-archiving (older than {} days):",
+                "🤖 {} {} {} eligible for auto-archiving NOW:",
                 auto_archive_items.len(),
                 auto_plural,
                 if auto_archive_items.len() == 1 {
                     "is"
                 } else {
                     "are"
-                },
-                self.config.auto_archive_threshold_days
+                }
             );
 
             for item in &auto_archive_items {
-                println!("   {}", item.display());
+                println!(
+                    "   {} [notified {} times]",
+                    item.display(),
+                    item.notification_count
+                );
             }
 
             println!(

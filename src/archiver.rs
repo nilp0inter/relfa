@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use crate::config::Config;
 use crate::scanner::StaleItem;
+use crate::state::NotificationState;
 
 pub struct Archiver {
     config: Config,
@@ -90,6 +91,11 @@ impl Archiver {
                 &archived_time,
             )?;
         }
+
+        // Reset notification count since file was archived
+        let mut state = NotificationState::load().unwrap_or_default();
+        state.reset_notification_count(&item.name);
+        state.save()?;
 
         println!(
             "✅ Archived '{}' to {} locations",

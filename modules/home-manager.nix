@@ -49,6 +49,12 @@
                 description = "Number of days after which files are automatically archived.";
               };
 
+              auto_archive_min_scans = lib.mkOption {
+                type = lib.types.ints.positive;
+                default = 24;
+                description = "Minimum number of times a file must be notified before auto-archiving.";
+              };
+
               notification = lib.mkOption {
                 type = lib.types.enum [
                   "cli"

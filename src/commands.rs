@@ -10,6 +10,7 @@ use crate::archiver::Archiver;
 use crate::config::Config;
 use crate::graveyard::GraveyardManager;
 use crate::scanner::{Scanner, StaleItem};
+use crate::state::NotificationState;
 use crate::utils::{delete_item, open_file_with_default, touch_item, view_file_with_pager};
 
 fn get_single_keypress() -> Result<char> {
@@ -35,7 +36,8 @@ fn get_single_keypress() -> Result<char> {
 pub fn scan_inbox() -> Result<()> {
     let config = Config::load_without_save()?;
     let scanner = Scanner::new(config);
-    let stale_items = scanner.scan_inbox()?;
+    // Use the version that tracks notifications
+    let stale_items = scanner.scan_inbox_with_notification_tracking()?;
     scanner.display_scan_results(&stale_items);
     Ok(())
 }
@@ -112,6 +114,10 @@ pub fn interactive_review() -> Result<()> {
                 }
                 't' => {
                     touch_item(&item.path)?;
+                    // Reset notification count since file was touched
+                    let mut state = NotificationState::load().unwrap_or_default();
+                    state.reset_notification_count(&item.name);
+                    state.save()?;
                     println!("✨ Updated modification time for '{}' - file will be kept for another {} days", 
                              item.name, config.age_threshold_days);
                     skipped_count += 1; // Count as skipped since we're keeping it
@@ -136,6 +142,10 @@ pub fn interactive_review() -> Result<()> {
 
                     if confirmation == item.name {
                         delete_item(&item.path)?;
+                        // Reset notification count since file was deleted
+                        let mut state = NotificationState::load().unwrap_or_default();
+                        state.reset_notification_count(&item.name);
+                        state.save()?;
                         println!("🗑️  Permanently deleted '{}'", item.name);
                         archived_count += 1; // Count as "processed"
                         break;
@@ -247,12 +257,18 @@ pub fn archive_item_with_note(item_name: &str, note: Option<&str>) -> Result<()>
     };
 
     let age_days = (Utc::now() - last_modified).num_days();
+
+    // Get notification count for this item
+    let state = NotificationState::load().unwrap_or_default();
+    let notification_count = state.get_notification_count(item_name);
+
     let item = StaleItem {
         path: inbox_path.clone(),
         name: item_name.to_string(),
         last_modified,
         is_directory: inbox_path.is_dir(),
         age_days,
+        notification_count,
     };
 
     // Show warning if file is not stale

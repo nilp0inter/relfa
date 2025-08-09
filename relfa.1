@@ -78,6 +78,9 @@ Number of days after which files are considered stale (default: 3).
 .B auto_archive_threshold_days
 Number of days after which files are automatically archived when running 'relfa archive' without arguments (default: 7).
 .TP
+.B auto_archive_min_scans
+Minimum number of times a file must be notified to the user before it becomes eligible for auto-archiving (default: 24). Protects against auto-archiving on sporadically-used computers.
+.TP
 .B notification
 Notification type: "cli" or "desktop" (default: "cli").
 .TP
