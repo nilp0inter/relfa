@@ -1,6 +1,6 @@
 [package]
 name = "relfa"
-version = "0.2.8"
+version = "0.3.0"
 edition = "2021"
 authors = ["Roberto Abdelkader Martínez Pérez <robertomartinezp@gmail.com>"]
 description = "A gentle digital gravedigger to lovingly archive your old files."
