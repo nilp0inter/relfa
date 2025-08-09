@@ -85,6 +85,7 @@ For each file, you will be prompted to choose an action:
 
 -   `(a)rchive`: Move the file to the graveyard.
 -   `(n)ote+archive`: Archive the file and attach an epitaph (a descriptive note).
+-   `(t)ouch`: Update the file's modification time to keep it for another period.
 -   `(d)elete`: Permanently delete the file (requires confirmation).
 -   `(v)iew`: Preview the file's content using your configured pager.
 -   `(o)pen`: Open the file with its default application.

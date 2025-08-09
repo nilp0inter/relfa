@@ -77,6 +77,29 @@ pub fn delete_item(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn touch_item(path: &Path) -> Result<()> {
+    use std::time::SystemTime;
+
+    let now = SystemTime::now();
+
+    if path.exists() {
+        // Update both access and modification times to current time
+        filetime::set_file_times(
+            path,
+            filetime::FileTime::from_system_time(now),
+            filetime::FileTime::from_system_time(now),
+        )
+        .context(format!(
+            "Failed to update timestamps for: {}",
+            path.display()
+        ))?;
+    } else {
+        return Err(anyhow::anyhow!("Path does not exist: {}", path.display()));
+    }
+
+    Ok(())
+}
+
 pub fn copy_file_or_dir(source: &Path, dest: &Path) -> Result<()> {
     if source.is_file() {
         if let Some(parent) = dest.parent() {

@@ -6,7 +6,7 @@ use crate::archiver::Archiver;
 use crate::config::Config;
 use crate::graveyard::GraveyardManager;
 use crate::scanner::{Scanner, StaleItem};
-use crate::utils::{delete_item, open_file_with_default, view_file_with_pager};
+use crate::utils::{delete_item, open_file_with_default, touch_item, view_file_with_pager};
 
 pub fn scan_inbox() -> Result<()> {
     let config = Config::load_without_save()?;
@@ -37,7 +37,7 @@ pub fn interactive_review() -> Result<()> {
         println!("[{}/{}] {}", i + 1, stale_items.len(), item.display());
 
         loop {
-            print!("Action: (a)rchive, (n)ote+archive, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit? ");
+            print!("Action: (a)rchive, (n)ote+archive, (t)ouch, (d)elete, (v)iew, (o)pen, (s)kip, (q)uit? ");
             io::stdout().flush()?;
 
             let mut input = String::new();
@@ -64,6 +64,13 @@ pub fn interactive_review() -> Result<()> {
                         archiver.archive_item_with_note(item, Some(note))?;
                     }
                     archived_count += 1;
+                    break;
+                }
+                "t" | "touch" => {
+                    touch_item(&item.path)?;
+                    println!("✨ Updated modification time for '{}' - file will be kept for another {} days", 
+                             item.name, config.age_threshold_days);
+                    skipped_count += 1; // Count as skipped since we're keeping it
                     break;
                 }
                 "d" | "delete" => {
@@ -111,7 +118,7 @@ pub fn interactive_review() -> Result<()> {
                 }
                 _ => {
                     println!(
-                        "Please enter 'a' for archive, 'n' for note+archive, 'd' for delete, 'v' for view, 'o' for open, 's' for skip, or 'q' to quit"
+                        "Please enter 'a' for archive, 'n' for note+archive, 't' for touch, 'd' for delete, 'v' for view, 'o' for open, 's' for skip, or 'q' to quit"
                     );
                     continue;
                 }
