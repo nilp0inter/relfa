@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":separateMultipleMajorReleases"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["cargo"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "groupName": "Rust patch updates",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": false
+    },
+    {
+      "groupName": "Rust minor updates", 
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["minor"],
+      "automerge": false
+    },
+    {
+      "groupName": "Rust major updates",
+      "matchManagers": ["cargo"], 
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ],
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "stabilityDays": 3,
+  "schedule": ["before 6am on monday"],
+  "timezone": "UTC",
+  "labels": ["dependencies"],
+  "reviewers": [],
+  "assignees": [],
+  "commitMessagePrefix": "chore(deps):",
+  "semanticCommits": "enabled",
+  "dependencyDashboard": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  }
+}
