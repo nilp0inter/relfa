@@ -8,34 +8,52 @@
   ],
   "packageRules": [
     {
-      "matchManagers": ["cargo"],
+      "matchManagers": [
+        "cargo"
+      ],
       "rangeStrategy": "bump"
     },
     {
       "groupName": "Rust patch updates",
-      "matchManagers": ["cargo"],
-      "matchUpdateTypes": ["patch"],
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
       "automerge": false
     },
     {
-      "groupName": "Rust minor updates", 
-      "matchManagers": ["cargo"],
-      "matchUpdateTypes": ["minor"],
+      "groupName": "Rust minor updates",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
       "automerge": false
     },
     {
       "groupName": "Rust major updates",
-      "matchManagers": ["cargo"], 
-      "matchUpdateTypes": ["major"],
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "automerge": false
     }
   ],
   "prConcurrentLimit": 3,
   "prHourlyLimit": 2,
-  "stabilityDays": 3,
-  "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "3 days",
+  "schedule": [
+    "before 6am on monday"
+  ],
   "timezone": "UTC",
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "reviewers": [],
   "assignees": [],
   "commitMessagePrefix": "chore(deps):",
@@ -43,6 +61,8 @@
   "dependencyDashboard": true,
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 6am on monday"]
+    "schedule": [
+      "before 6am on monday"
+    ]
   }
 }
