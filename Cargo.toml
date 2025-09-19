@@ -10,14 +10,14 @@ homepage = "https://github.com/nilp0inter/relfa"
 documentation = "https://docs.rs/relfa"
 
 [dependencies]
-anyhow = "1.0.98"
-chrono = { version = "0.4.41", features = ["serde"] }
-clap = { version = "4.5.43", features = ["derive"] }
+anyhow = "1.0.99"
+chrono = { version = "0.4.42", features = ["serde"] }
+clap = { version = "4.5.47", features = ["derive"] }
 crossterm = "0.29.0"
 dirs = "6.0.0"
-filetime = "0.2.25"
+filetime = "0.2.26"
 gethostname = "1.0.2"
 notify-rust = "4.11.7"
-serde = { version = "1.0.219", features = ["derive"] }
-toml = "0.9.5"
+serde = { version = "1.0.225", features = ["derive"] }
+toml = "0.9.6"
 walkdir = "2.5.0"
