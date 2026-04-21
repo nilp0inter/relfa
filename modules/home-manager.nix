@@ -16,8 +16,8 @@
 
         package = lib.mkOption {
           type = lib.types.package;
-          default = inputs.self.packages.${pkgs.system}.relfa;
-          defaultText = lib.literalExpression "inputs.self.packages.\${pkgs.system}.relfa";
+          default = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.relfa;
+          defaultText = lib.literalExpression "inputs.self.packages.\${pkgs.stdenv.hostPlatform.system}.relfa";
           description = "The relfa package to use.";
         };
 
